@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>VIEM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
+<link href="style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div class="math">
+
+<h2>Volatile Identifier Entity Matching (VIEM) Algorithm</h2>
+<div id="watermark">Draft</div>
+
+<p>Mathematical description of a an entity matching algorithm
+based on possibly volatile identifiers with a strict ordering.</p>
+
+<p class="footnote">This document is best viewed with Firefox or another SGML compliant browser. IE has problems with the mathematical characters up to version 7.</p>
+<h3>Abstract</h3>
+<p>The analysis phase of the development of a craft tracking system for 
+the Australia Maritime Safety Authority revealed a complex entity 
+matching problem. The requirement was to accept timestamped position reports (<i>fixes</i>) with one or more associated 
+identifiers and associate those reports with entities (vessels, aircraft, vehicles, tracking devices). Fixes 
+arrive from one or more sources. <i>Identifiers</i> uniquely identify 
+an entity at the time of the fix but some identifiers may change over time (<i>volatile identifiers</i>).
+As fixes arrive entities may be merged, or have identifiers removed 
+from them.</p>
+
+<p>Where is the complexity? Consider the case of a fix arriving with 5 identifiers. 
+Those identifiers may match say 3 till then different existing entities and it has to be decided
+ how and if those entities are going to be merged and what is to occur to the other identifiers 
+ on those entities. Defining a consistent, deterministic approach across the 
+ large number of scenarios involved is an interesting challenge. </p> 
+
+<p>Two general principles are applied by the algorithm:</p>
+
+<p class="indent1"><b>Principle 1</b>: Latest fix <i>wins</i></p>
+<p class="indent1"><b>Principle 2</b>: Least volatile identifier <i>wins</i></p>
+
+<p>The algorithm is:</p>
+ 
+<ol>
+<li>Find the primary match of the fix against existing entities (use <i>Principle 2</i>).</li>
+<li>Find all entities that have identifiers in common with the fix.</li>
+<li><i>Fold</i> the intersecting entity identifier sets with each other starting with the primary match identifier set.</li>
+<li>The result of the fold will be the new identifier set of the primary match.</li>
+<li>From the rest of the intersecting entities remove any identifiers now contained in the new primary match identifier set.</li> 
+</ol>
+
+<p>Fix identifiers are associated with either</p>
+<ul>
+<li>no entities (a new entity is created using all of the fix identifiers)</li>
+<li>or, a primary entity and zero or more secondary entities</li>
+</ul>
+<p>The effect on the primary entity of the merge of the fix identifiers is:</p>
+<ul>
+<li>new identifiers of new identifier types are added from the fix to the entity</li>
+<li>identifiers are replaced with identifiers of the same identifier type from the fix if the fix identifier timestamp is later than the entity identifier timestamp.</li>
+</ul>
+
+<p>The effect on the secondary entity of the merge of the fix identifiers is:</p>
+<ul>
+<li>all of the matching identifiers with earlier timestamps than the fix timestamp are removed from the entity.</li>
+<li>if the primary identifier of the entity is a matching identifier then all identifiers are removed from the entity.</li>
+</ul>
+
+
+
+
+<h3>Conventions</h3>
+<p>Capital variable names are used for sets.</p>
+
+<p>&weierp;(S) is the <a href="http://en.wikipedia.org/wiki/Power_set">power set</a> of a set S</p>
+
+<p>When a function f is defined e.g. f : P &rarr; Q assume an
+additional implicit definition f: &weierp;(P) &rarr; &weierp;(Q) given
+by f(X) = {f(x): x &isin; X}</p>
+<h3>Entity Matching Algorithm</h3>
+<p>Define</p>
+<p class="indent1">I = set of identifiers</p>
+<p class="indent1">T = set of identifier types</p>
+<p class="indent1">S = set of timed identifiers = I &#x2a2f; &real; </p>
+<p class="indent2">For x &isin; S, x = (x<sub>id</sub>, x<sub>time</sub>) where x<sub>id</sub> &isin; I, x<sub>time</sub> &isin; &real;</p>
+<!-- 
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow>
+  <mrow>
+    <mtext>For</mtext>
+    <mspace width="0.5em" />
+    <mi>x</mi>
+    <mo>&isin;</mo>
+    <mi>S</mi>
+    <mtext>,</mtext>
+    <mspace width="0.5em" />
+    <mi>x</mi>
+    <mo>=</mo>
+    <mo>(</mo>
+    <msub>
+            <mi>x</mi>
+          <mtext>id</mtext>
+    </msub>
+    <mtext>,</mtext>
+    <msub>
+            <mi>x</mi>
+          <mtext>time</mtext>
+    </msub>
+    <mo>)</mo>
+    <mspace width="0.5em" />
+    <mtext>where</mtext>
+    <mspace width="0.5em" />
+    <msub>
+            <mi>x</mi>
+          <mtext>id</mtext>
+    </msub>
+    <mo>&isin;</mo>
+    <mi>I</mi>
+    <mtext>,</mtext>
+    <msub>
+            <mi>x</mi>
+          <mtext>time</mtext>
+    </msub>
+    <mo>&isin;</mo>
+    <mi>&reals;</mi>
+  </mrow>
+</mrow>
+</math>
+ -->
+<p class="indent1"><b>B</b> = {true, false}</p>
+
+<p>Given</p>
+<p class="indent1">t: I &rarr; T, t: S &rarr; T categorise an identifier with an
+identifier type</p>
+<p class="indent1">&gt; : TxT &rarr; <b>B</b> is an infix comparator
+of the <i>strength</i> of identifier types</p>
+<p class="indent1">&gt;&gt; : TxT &rarr; <b>B</b> is an infix
+comparator of the <i>order</i> of identifier types where</p>
+<p class="indent3">&forall; s,t &isin; T, (s !&gt; t and t !&gt; s)
+&hArr; s = t, s &gt; t &rArr; s &gt;&gt; t</p>
+
+
+<p>Define</p>
+
+<p class="indent1">V (valid identifier sets) = { X &sub; S : |t(X)|=|X|}</p>
+
+<p class="indent1">Z' = { Z &sub; &weierp;(V) where elements of id(Z)
+are disjoint sets}</p>
+
+<hr />
+<h3>New Approach</h3>
+
+<p>Want to facilitate a scalable implementation of this algorithm with high availability, partition tolerance and eventual consistency (see <a href="http://www.julianbrowne.com/article/viewer/brewers-cap-theorem">CAP Theorem).</a></p>
+
+<p>An entity function e: S &rarr; &weierp;(S) satisfies</p>
+
+<p class="indent1">&forall; i &isin; S, i &isin; e(i)</p>
+
+<p>Given</p> 
+<ul>
+	<li>set of timed identifiers Q &isin; V with an entity function e<sub>Q</sub> : S &rarr; S s.t. &forall; i &isin; I where i &notin; Q, e(i) = {i}</li>
+	<li>set of timed identifiers A &isin; V</li>
+</ul>
+</li>
+<p>If A = {a<sub>1</sub>,a<sub>2</sub>,..,a<sub>n</sub>} in descending strict order then 
+the merging of A with (Q,e) should be equivalent to the merging of 
+{a<sub>1</sub>}, {a<sub>1</sub>,a<sub>2</sub>}, {a<sub>1</sub>,a<sub>3</sub>},..,{a<sub>1</sub>,a<sub>n</sub>} with (Q, e) 
+in that order.</p>
+<p>Now assume A has either 1 or 2 elements</p>
+<p class="indent1">Define &beta; : S &#x2a2f; S &rarr; S by &beta;(X,Y) = { x &isin; X : &exist; y &isin; Y s.t. x<sub>id</sub> = y<sub>id</sub> and x<sub>time</sub> &lt; y<sub>time</sub> }</p>
+<p class="indent1">Define &gamma; : S &#x2a2f; S &rarr; S by &gamma;(X,Y) = {x &isin; X : &exist; y &isin; Y s.t. t(x) = t(y) and x<sub>time</sub> &lt; y<sub>time</sub>}</p> 
+<p class="indent1">Let B<sub>1</sub> = A<sub>id</sub> &cap; Q<sub>id</sub></p>
+<p class="indent1">Define &mu; : S X &weierp;(I) &rarr; S given by &mu;(X,Y) = {x &isin; X : x<sub>id</sub> &isin; Y}</p>
+<p class="indent1">Let B<sub>2</sub> = &mu;(Q,B<sub>1</sub>)</p>
+<p class="indent1">Let B<sub>3</sub> = &beta;(B<sub>2</sub>,B<sub>2</sub>)</p>
+<p class="indent1">Let B<sub>4</sub> = &gamma;(e<sub>Q</sub>(a<sub>1</sub>), B<sub>2</sub>)</p>
+<p class="indent1">Let B<sub>5</sub> = Q \ B<sub>3</sub> \ B<sub>4</sub></p>
+
+
+
+<p class="indent1">Let D = Q \ B \ C, define e' : S &rarr; &weierp;(S) given by</p>
+<p class="indent1">Let Q' = D &cup; {i &isin; A : i<sub>id</sub> &notin; B} &cup; {i &isin; A : t(i) &notin; C}</p>
+<p class="indent2">e'(i) = </p>	
+<p class="indent3">e(i) , i &isin; D</p>
+<p class="indent3">e(a<sub>1</sub>) , i &notin; D, i &isin; Q'</p>
+<p class="indent3">{i} , otherwise</p>
+
+
+<hr />
+
+
+<p class="indent1">pm (primary match) : Z' &#x2a2f; S &rarr; S given
+by</p>
+<p class="indent2">pm(Z,X) =</p>
+<p class="indent3">&empty; &nbsp;&nbsp;&nbsp;&nbsp;,  Z = &empty; or X<sub>id</sub> &cap; Y<sub>id</sub> = &empty;
+&forall; Y &isin; Z</p>
+<p class="indent3">Y &isin; Z where Y<sub>id</sub> &cap; X<sub>id</sub> &gt;&gt; R<sub>id</sub> &cap;
+X<sub>id</sub> &forall; R  &isin; Z, R &ne; Y &nbsp;&nbsp;&nbsp;&nbsp;, otherwise</p>
+
+<p class="indent1">\<sub>f</sub> : &weierp;(A) &#x2a2f; &weierp;(A) &rarr; &weierp;(A) for function f : A &rarr;B by</p>
+	<p class="indent2">X \<sub>f</sub> Y = { x &isin; X : f(x) &notin; f(Y) }</p>
+
+<p class="indent1">&mu; : S &#x2a2f; S &rarr; S by</p>
+	<p class="indent2">&mu;(X,Y) =</p>
+		<p class="indent3">{y &isin; Y : &exist; x &isin; X s.t. t(y) = t(x) and y<sub>time</sub> &gt; x<sub>time</sub> }</p>
+
+<p class="indent1">G : S &#x2a2f; S &#x2a2f; &rarr; S by</p>
+	<p class="indent2">G(X,Y) = </p>
+		<p class="indent3"> (Y \<sub>t</sub> X) &cup; &mu;(X,Y)</p>
+	<p class="indent2">G(X,Y) is thus the subset of Y that has no type in X or those that match type with X but have a more recent time.</p>
+
+<!--  product -->
+<p class="indent1">&otimes; : S &#x2a2f; S &#x2a2f; S &rarr; S by</p>
+	<p class="indent2">X &otimes;<sub>R</sub> Y =</p>
+		<p class="indent3">X &nbsp;&nbsp;&nbsp;&nbsp;, Y<sub>id</sub> &cap; R<sub>id</sub> = &empty;</p>
+		<p class="indent3">Y \<sub>id</sub> X &nbsp;&nbsp;&nbsp;&nbsp;, t<sub>max</sub>(Y) &gt; t<sub>max</sub>(R) </p>
+		<p class="indent3">(X \<sub>t</sub> G(X,Y)) &cup;
+		G(X,Y) = (X \<sub>t</sub> &mu;(X,Y)) &cup; G(X,Y) &nbsp;&nbsp;&nbsp;&nbsp;, otherwise</p>
+
+<p class="indent1">f: Z' &#x2a2f; S &rarr; Z' by</p>
+<p class="indent2">f(Z,A) =</p>
+<p class="indent3">fold( {Y &isin;Z : Y<sub>id</sub> &cap; A<sub>id</sub> &ne; &empty;},&otimes;<sub>A</sub>
+, pm(Z,A) &otimes;<sub>A</sub> A)</p>
+<p class="indent1"> About <a href="http://en.wikipedia.org/wiki/Fold_%28higher-order_function%29"><i>fold</i>.</a></p>
+
+<p>Finally, define &alpha;: Z' &#x2a2f; S &rarr; Z' by</p>
+<p class="indent1">&alpha;(Z,A) =</p>
+<p class="indent2">Z &cup; {A} &nbsp;&nbsp;&nbsp;&nbsp;, pm(Z,A) = &empty;</p>
+<p class="indent2">({{i &isin; X : i<sub>id</sub> &notin; f(Z,A)<sub>id</sub>} : X &isin; Z } 
+ &cup; {f(Z,A)})\{&empty;}; &nbsp;&nbsp;&nbsp;&nbsp;, otherwise</p>
+
+<p>&alpha;(Z,A) is thus the entity set obtained by merging timed identifier set A into entity set Z.</p>
+
+<h3>Notes</h3>
+<p>&gt;&gt; is an arbitrary strict comparator whose only purpose is to ensure deterministic behaviour of &alpha;.</p>
+
+
+<h3>Properties</h3>
+<p>The functions above have the following properties:</p>
+<p class="indent1">X \<sub>f</sub> (Y \<sub>f</sub> X) = X</p>
+	<p class="indent2">Proof:</p>
+		<p class="indent3">By definition f(Y \<sub>f</sub> X) &cap; f(X) = &empty; for all functions f:A &rarr; B</p>
+		<p class="indent3">&there4; X \<sub>f</sub> (Y \<sub>f</sub> X)  = { x &isin; X : f(x) &notin; f(Y \<sub>f</sub> X )} = {x &isin; X} = X</p>
+	<hr class="indent1"/>
+
+<p class="indent1">C \<sub>t</sub> (A &cup; B) =  (C \<sub>f</sub> A) &cap; (C \<sub>f</sub> B)</p>
+	<p class="indent2">Proof:</p>
+	<p class="indent3">C \<sub>t</sub> (A &cup; B) = { c &isin; C : f(c) &notin; f(A &cup; B) }</p>
+	<p class="indent4">= { c &isin; C : f(c) &notin; f(A) and f(c) &notin; f(B) }</p>
+	<p class="indent4">= { c &isin; C : f(c) &notin; f(A)} &cap;{ c &isin; C : f(c) &notin; f(B) }</p>
+	<p class="indent4">= C \<sub>f</sub> A &cap; C \<sub>f</sub> B</p>
+	<hr class="indent1"/>
+	
+<p class="indent1">(B &cup; C) \<sub>f</sub> A = (C \<sub>f</sub> A) &cup; (C \<sub>f</sub> B)</p>
+	<p class="indent2">Proof:</p>
+	<p class="indent3">&gamma;(A, B &cup; C) = { y &isin; B &cup; C : f(y) &notin; f(A)}</p>
+	<p class="indent3"> = { y &isin; B : f(y) &notin; f(A)} &cup; { y &isin; C : f(y) &notin; f(A) }</p>
+	<p class="indent3"> = (C \<sub>f</sub> A) &cup; (C \<sub>f</sub> B)</p>
+	<hr class="indent1"/>
+
+<p class="indent1">(C \<sub>t</sub> A) &cap; (C \<sub>t</sub> B) &sub; C \<sub>t</sub> (A &cap; B) where A,B,C &isin; V</p>
+	<p class="indent2">Proof:</p>
+	<p class="indent3">C \<sub>t</sub> (A &cap; B) = { y &isin; C: t(y) &notin; t(A &cap; B) }</p>
+	<p class="indent3">Now t(A &cap; B) &sub; t(A) &cap; t(B)</p>
+	<p class="indent3">&there4; { y &isin; C: t(y) &notin; t(A &cap; B) }</p>
+	<p class="indent4">&sup; { y &isin; C : t(y) &notin; t(A) &cap; t(B) }</p>
+	<p class="indent4">= { y &isin; C : t(y) &notin; t(A)} &cap; { y &isin; C : t(y) &notin; t(B) }</p>
+	<p class="indent4">=(C \<sub>t</sub>A) &cap; (C \<sub>t</sub> B)</p>
+	<hr class="indent1"/>
+	
+<p class="indent1">&mu;(A, B &cup; C) = &mu;(A,B) &cup; &mu;(A,C) if A,B &isin; V</p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+
+<p class="indent1">&mu;(A &cup;, B, C) = &mu;(A,B) &cup; &mu;(B,C) </p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+
+<p class="indent1">t(X) &sub; t(X &otimes;<sub>R</sub> Y)</p>
+<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+
+<p class="indent1">(X &otimes;<sub>R</sub> Y) &otimes;<sub>R</sub> Y = X &otimes;<sub>R</sub> Y  (<a href="http://en.wikipedia.org/wiki/Idempotence">Idempotence</a>)</p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+
+<p class="indent1">(X &otimes;<sub>R</sub> Y) &otimes;<sub>R</sub> Z = (X &otimes;<sub>R</sub> Z) &otimes;<sub>R</sub> Y  
+	if X<sub>id</sub>,Y<sub>id</sub>,Z<sub>id</sub> not disjoint with R<sub>id</sub> (partial commutativity)</p>
+	<p class="indent2">This property is a prerequisite for using the fold function.</p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+<p class="indent1">&alpha;(&alpha;(Z,A),B) = &alpha;(&alpha;(Z,B),A) (commutative composition)</p>
+	<p class="indent2">If this property is true then time order of addition of sets is irrelevant.</p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+<p class="indent1">pm is one-to-one</p>
+	<p class="indent2">Proof: ...</p>
+	<hr class="indent1"/>
+</div>
+	
+<h3>Tests</h3>
+<div>>${tests}</div>
+	
+</body>
+</html>

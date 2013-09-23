@@ -1,0 +1,27 @@
+            ------
+            Usage
+            ------
+            Dave Moten
+            ------
+            YYYY-MM-DD
+
+Usage
+             
+ Add this to the dependencies section of your pom.xml:
+ 
+-----------------------------------
+<dependency>
+    <groupId>org.moten.david</groupId>
+    <artifactId>viem</artifactId>
+    <version>${project.version}</version>
+</dependency>
+-----------------------------------
+
+ Add this to the repositories section of your pom.xml
+ 
+-------------------------------------
+<repository>
+    <id>googlecode-moten-util</id>
+    <url>http://moten-util.googlecode.com/svn/repo</url>       
+</repository>
+-------------------------------------
