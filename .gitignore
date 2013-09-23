@@ -2,3 +2,7 @@ target/
 .settings
 .project
 .classpath
+viem/.settings
+view/.project
+viem/.classpath
+viem/.cache

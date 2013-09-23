@@ -6,13 +6,12 @@
 		<artifactId>viem-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.moten.david</groupId>
 	<artifactId>viem</artifactId>
 	<name>${project.artifactId}</name>
 	<description>Scala implementation of the VIEM algorithm</description>
 	<inceptionYear>2008</inceptionYear>
 	<properties>
-		<scala.version>2.8.1</scala.version>
+		<scala.version>2.10.2</scala.version>
 	</properties>
 
 	<dependencies>
@@ -25,12 +24,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.scala-tools.testing</groupId>
-			<artifactId>specs_2.8.1</artifactId>
-			<version>1.6.6</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
