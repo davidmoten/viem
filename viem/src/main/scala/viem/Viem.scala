@@ -69,7 +69,7 @@ case class Entity(set: Set[TimedIdentifier], data: Data) {
 /**
  * The result of a merge. This trait is sealed so that all its 
  * implementations must come from this class.
- * @author dxm
+ * @author davidmoten
  *
  */
 sealed trait Result
@@ -403,7 +403,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
     if (matches.isEmpty) return Set(a)
 
     //sort the list in descending strength of identifier
-    val list = List.fromIterator(a.set.iterator).sortWith((x, y) => (x compare y) < 0)
+    val list = a.set.toList.sortWith((x, y) => (x compare y) < 0)
 
     println("adding " + list)
 
@@ -437,7 +437,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
       case r: Entities => {
         val entities = group.entities - prev.entity - entity ++ r.set
         val g = Group(entities, EntityAndId(entity, x))
-        return if (iterator.hasNext)
+        if (iterator.hasNext)
           findGroup(data, g, iterator.next, iterator)
         else g
       }
@@ -453,14 +453,14 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
           if (iterator.hasNext) {
             val y = iterator.next
             val g = Group(entities, EntityAndId(find(entities, y.id), y))
-            return findGroup(data, g, y, iterator)
+            findGroup(data, g, y, iterator)
           } else
             // none left, return what we've got
-            return Group(entities, group.previous)
+            Group(entities, group.previous)
         } else {
           //don't advance the iterator, throw away previous identifier
           val g = Group(entities, EntityAndId(entity, x))
-          return findGroup(data, g, x, iterator)
+          findGroup(data, g, x, iterator)
         }
       }
     }
@@ -469,7 +469,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
 
 /**
  * Utility methods for merging.
- * @author dxm
+ * @author davidmoten
  *
  */
 object Merger {
@@ -485,7 +485,7 @@ object Merger {
 
 /**
  * Holds the latest merged entities.
- * @author dxm
+ * @author davidmoten
  *
  */
 trait Entries[T] {
@@ -506,7 +506,7 @@ trait Entries[T] {
 
 /**
  * Holds the latest merged entities in memory.
- * @author dxm
+ * @author davidmoten
  *
  */
 case class MemoryEntries(entries: Set[Entity], merger: Merger) extends Entries[MemoryEntries] {
