@@ -24,11 +24,12 @@ case class IdentifierType(name: String) extends Ordered[IdentifierType] {
 
 /**
  *
- * An identifier for e.g. an [[viem.Entity]] composed of an [[viem.IdentifierType]] and a [[java.lang.String]] value.
- * Has strict ordering based on [[viem.IdentifierType]] ordering then value alphabetical
- * ordering.
+ * An identifier for e.g. an [[viem.Entity]] composed of an [[viem.IdentifierType]]
+ * and a [[java.lang.String]] value. Has strict ordering based on
+ * [[viem.IdentifierType]] ordering then value alphabetical ordering.
  */
-case class Identifier(typ: IdentifierType, value: String) extends Ordered[Identifier] {
+case class Identifier(typ: IdentifierType, value: String)
+  extends Ordered[Identifier] {
   def compare(that: Identifier): Int =
     if (this.typ.equals(that.typ))
       this.value.compareTo(that.value)
@@ -37,9 +38,11 @@ case class Identifier(typ: IdentifierType, value: String) extends Ordered[Identi
 }
 
 /**
- * An [[viem.Identifier]] with a [[scala.math.BigDecimal]] timestamp. Might be used to identify an [[viem.Entity]] at a given time.
+ * An [[viem.Identifier]] with a [[scala.math.BigDecimal]] timestamp.
+ * Might be used to identify an [[viem.Entity]] at a given time.
  */
-case class TimedIdentifier(id: Identifier, time: BigDecimal) extends Ordered[TimedIdentifier] {
+case class TimedIdentifier(id: Identifier, time: BigDecimal)
+  extends Ordered[TimedIdentifier] {
   def compare(that: TimedIdentifier): Int =
     //compare using only type and time (not identifier value)
     if (this.id.typ.equals(that.id.typ))
@@ -115,8 +118,8 @@ abstract trait MergeValidator {
  */
 trait MergerLike {
   /**
-   * Returns the result of merging [[viem.Entity]] ''a'' with the entities that it matches
-   * (found by matching [[viem.Identifier]]s).
+   * Returns the result of merging [[viem.Entity]] ''a'' with the entities
+   * that it matches (found by matching [[viem.Identifier]]s).
    * @param a
    * @param matches
    * @return
@@ -125,12 +128,181 @@ trait MergerLike {
 }
 
 /**
- * Utility class for performing merges of [[scala.collection.immutable.Set]] of [[viem.TimedIdentifier]].
+ * Utility class for performing merges of [[scala.collection.immutable.Set]]
+ * of [[viem.TimedIdentifier]].
  */
-class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondaryIntersects: Boolean = false) extends MergerLike {
+class Merger(validator: MergeValidator,
+  onlyMergeIfStrongestIdentifierOfSecondaryIntersects: Boolean = false) extends MergerLike {
 
   /**
-   * Implicit definition that allow a [[viem.Entity]] to be used as a [[scala.collection.immutable.Set]] of [[viem.TimedIdentifier]].
+   * Returns the [[viem.Entity]]s which are the result of adding ''a'' to the ''matches''.
+   * @param a
+   * @param matches
+   * @return
+   */
+  def merge(a: Entity, matches: Set[Entity]): Set[Entity] = {
+    //check some preconditions
+    require(a != null, "parameter 'a' cannot be null")
+    require(matches != null, "matches cannot be null")
+    require(!a.isEmpty, "'a' must have at least one identifier")
+    require(matches.isEmpty ||
+      matches.filter(_.map(_.id).intersect(a.map(_.id)).isEmpty).isEmpty,
+      "every Entity in matches must have an intersection with a in terms of [[viem.Identifier]]")
+    require(matches.isEmpty ||
+      matches.map(_.set).flatten.map(_.id).size == matches.map(_.set).flatten.size,
+      "elements of matches must be mutually non intersecting n terms of [[viem.Identifier]]")
+
+    //if no matches the just return the set A back
+    if (matches.isEmpty) return Set(a)
+
+    //sort the list in descending strength of identifier
+    val list = a.set.toList.sortWith((x, y) => (x compare y) < 0)
+
+    println("adding " + list)
+
+    //obtain an iterator for the identifiers and get the first element of the list
+    val iterator = list.iterator
+
+    //preconditions have checked that iterator has at least one element
+    val firstId = iterator.next();
+
+    //initialize the Group object to pass into the recursive method
+    val group = Group(matches, EntityAndId(find(matches, firstId.id), firstId))
+
+    //use recursion to run through the iterator performing merges
+    val g = findGroup(a.data, group, firstId, iterator)
+
+    //return the merged entities
+    return g.entities
+  }
+
+  private def findGroup(data: Data, group: Group, x: TimedIdentifier,
+    iterator: Iterator[TimedIdentifier]): Group = {
+    println("merging " + x)
+
+    val entity = find(group.entities, x.id)
+    val prevEntity = find(group.entities, group.previous.id.id)
+    val prev = EntityAndId(prevEntity, group.previous.id)
+    //attempt the merge
+    val result = merge(prev.id, x, data, prev.entity, entity)
+
+    result match {
+      //merge succeeded
+      case r: Entities => {
+        val entities = group.entities - prev.entity - entity ++ r.set
+        val g = Group(entities, EntityAndId(entity, x))
+        if (iterator.hasNext)
+          findGroup(data, g, iterator.next, iterator)
+        else
+          g
+      }
+      //merge deemed invalid
+      case InvalidMerge(data) => {
+        //remove problem identifiers from data which is 
+        //one of entity or previous
+        val entities = group.entities - prev.entity - entity +
+          removeIdentifierIfNotOnly(prev.entity, x.id) +
+          removeIdentifierIfNotOnly(entity, x.id)
+
+        if (prev.entity == entity) {
+          if (iterator.hasNext) {
+            val y = iterator.next
+            val g = Group(entities, EntityAndId(find(entities, y.id), y))
+            findGroup(data, g, y, iterator)
+          } else
+            // none left, return what we've got
+            Group(entities, group.previous)
+        } else {
+          //don't advance the iterator, throw away previous identifier
+          val g = Group(entities, EntityAndId(entity, x))
+          findGroup(data, g, x, iterator)
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the result of the merge of a1 and a2 with associated metadata m,
+   * with the sets b and c. a1 must be in b and a2 must be in c (although
+   * possibly with different times).
+   * @param a1
+   * @param a2
+   * @param m
+   * @param b
+   * @param c
+   * @return
+   */
+  private[viem] def merge(a1: TimedIdentifier, a2: TimedIdentifier,
+    m: Data, b: Entity, c: Entity): Result = {
+
+    if (b == c && !b.isEmpty) return merge(a1, a2, m, b, empty)
+    //do some precondition checks on the inputs
+    assert(a1.time == a2.time, "a1 and a2 must have the same time because they came from the same fix set")
+    assert(b.isEmpty || b.map(_.id).contains(a1.id), "a1 id must be in b if b is non-empty")
+    assert(c.isEmpty || c.map(_.id).contains(a2.id), "a2 id must be in c if c is non-empty")
+    assert(!(c.isEmpty && !b.isEmpty && !b.map(_.id).contains(a1.id)), "a2 id must be in b if c is empty")
+    assert(b.map(_.id.typ).size == b.size, "b must not have more than one identifier of any type")
+    assert(c.map(_.id.typ).size == c.size, "c must not have more than one identifier of any type")
+    assert(b.map(_.id).intersect(c.map(_.id)).size == 0, "b and c cannot have an identifier in common")
+
+    if (!b.isEmpty && !validator.mergeIsValid(m, b.data))
+      return InvalidMerge(b.data)
+    else if (a1.id == a2.id)
+      merge(a1, m, b)
+    else if (c isEmpty)
+      merge(a1, a2, m, b)
+    else {
+      val a: Set[TimedIdentifier] = Set(a1, a2)
+      if (!validator.mergeIsValid(m, c.data))
+        return InvalidMerge(c.data)
+
+      if (!(>=(a1, b)) && !(>=(a2, c)))
+        if (validator.mergeIsValid(b.data, c.data)) {
+          //if b and c have conflicting identifiers that both have later 
+          //timestamps than a1 (or a2) then don't merge (no validity problem though)
+
+          //calculate common identifier types with different identifier values in b
+          val b2 = b.filter(t =>
+            c.map(x => x.id.typ)
+              .contains(t.id.typ) && !c.map(x => x.id).contains(t.id))
+          //calculate common identifier types with different identifier values in c
+          val c2 = c.filter(t =>
+            b.map(x => x.id.typ).
+              contains(t.id.typ) && !b.map(x => x.id).contains(t.id))
+          if (!b2.isEmpty && b2.map(_.time).max > a1.time)
+            //don't merge
+            return Entities(b, c)
+          else if (!c2.isEmpty && c2.map(_.time).max > a1.time)
+            return Entities(b, c)
+          else
+            return Entities(Entity(z(b, c), b.data))
+        } else
+          return InvalidMerge(c.data)
+      else if (>=(a1, b) && !(>=(a2, c)) && a2.id == c.max.id)
+        return Entities(Entity(z(z(b, c), a), c.data))
+      else if (a2.id == c.max.id)
+        return Entities(Entity(z(z(b, c), a), m))
+      else {
+        if (onlyMergeIfStrongestIdentifierOfSecondaryIntersects) {
+          //only merge across identifiers from c that intersect with a
+          val aTypes = a.map(_.id.typ)
+          val cIntersection = c.set.filter(x => aTypes.contains(x.id.typ))
+          val cComplement = c.set.filter(x => !aTypes.contains(x.id.typ))
+          if (cComplement.isEmpty)
+            return Entities(Entity(z(z(b, cIntersection), a), m))
+          else
+            return Entities(Entity(z(z(b, cIntersection), a), m), Entity(cComplement, c.data))
+        } else if (maxTime(a) >= maxTime(c))
+          return Entities(Entity(z(z(b, c), a), m))
+        else
+          return Entities(Entity(z(z(b, c), a), c.data))
+      }
+    }
+  }
+
+  /**
+   * Implicit definition that allow a [[viem.Entity]] to be used as a
+   * [[scala.collection.immutable.Set]] of [[viem.TimedIdentifier]].
    * @param a
    * @return
    */
@@ -145,7 +317,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    * @return
    */
   private[viem] def alpha(x: Set[TimedIdentifier], y: TimedIdentifier): Set[TimedIdentifier] = {
-   x.filter(_.id.typ == y.id.typ) + y
+    x.filter(_.id.typ == y.id.typ) + y
   }
 
   /**
@@ -238,7 +410,8 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    * @param b
    * @return
    */
-  private[viem] def merge(a1: TimedIdentifier, a2: TimedIdentifier, m: Data, b: Entity): Entities = {
+  private[viem] def merge(a1: TimedIdentifier, a2: TimedIdentifier,
+    m: Data, b: Entity): Entities = {
     if (b.isEmpty)
       Entities(Entity(Set(a1, a2), m))
     else if (>=(a1, b))
@@ -256,80 +429,6 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    */
   private[viem] def later(x: Set[TimedIdentifier], y: Set[TimedIdentifier]) =
     x.map(_.time).max > y.map(_.time).max
-
-  /**
-   * Returns the result of the merge of a1 and a2 with associated metadata m,
-   * with the sets b and c. a1 must be in b and a2 must be in c (although
-   * possibly with different times).
-   * @param a1
-   * @param a2
-   * @param m
-   * @param b
-   * @param c
-   * @return
-   */
-  private[viem] def merge(a1: TimedIdentifier, a2: TimedIdentifier, m: Data, b: Entity, c: Entity): Result = {
-
-    if (b == c && !b.isEmpty) return merge(a1, a2, m, b, empty)
-    //do some precondition checks on the inputs
-    assert(a1.time == a2.time, "a1 and a2 must have the same time because they came from the same fix set")
-    assert(b.isEmpty || b.map(_.id).contains(a1.id), "a1 id must be in b if b is non-empty")
-    assert(c.isEmpty || c.map(_.id).contains(a2.id), "a2 id must be in c if c is non-empty")
-    assert(!(c.isEmpty && !b.isEmpty && !b.map(_.id).contains(a1.id)), "a2 id must be in b if c is empty")
-    assert(b.map(_.id.typ).size == b.size, "b must not have more than one identifier of any type")
-    assert(c.map(_.id.typ).size == c.size, "c must not have more than one identifier of any type")
-    assert(b.map(_.id).intersect(c.map(_.id)).size == 0, "b and c cannot have an identifier in common")
-
-    if (!b.isEmpty && !validator.mergeIsValid(m, b.data))
-      return InvalidMerge(b.data)
-    else if (a1.id == a2.id)
-      merge(a1, m, b)
-    else if (c isEmpty)
-      merge(a1, a2, m, b)
-    else {
-      val a: Set[TimedIdentifier] = Set(a1, a2)
-      if (!validator.mergeIsValid(m, c.data))
-        return InvalidMerge(c.data)
-
-      if (!(>=(a1, b)) && !(>=(a2, c)))
-        if (validator.mergeIsValid(b.data, c.data)) {
-          //if b and c have conflicting identifiers that both have later 
-          //timestamps than a1 (or a2) then don't merge (no validity problem though)
-
-          //calculate common identifier types with different identifier values in b
-          val b2 = b.filter(t => c.map(x => x.id.typ).contains(t.id.typ) && !c.map(x => x.id).contains(t.id))
-          //calculate common identifier types with different identifier values in c
-          val c2 = c.filter(t => b.map(x => x.id.typ).contains(t.id.typ) && !b.map(x => x.id).contains(t.id))
-          if (!b2.isEmpty && b2.map(_.time).max > a1.time)
-            //don't merge
-            return Entities(b, c)
-          else if (!c2.isEmpty && c2.map(_.time).max > a1.time)
-            return Entities(b, c)
-          else
-            return Entities(Entity(z(b, c), b.data))
-        } else
-          return InvalidMerge(c.data)
-      else if (>=(a1, b) && !(>=(a2, c)) && a2.id == c.max.id)
-        return Entities(Entity(z(z(b, c), a), c.data))
-      else if (a2.id == c.max.id)
-        return Entities(Entity(z(z(b, c), a), m))
-      else {
-        if (onlyMergeIfStrongestIdentifierOfSecondaryIntersects) {
-          //only merge across identifiers from c that intersect with a
-          val aTypes = a.map(_.id.typ)
-          val cIntersection = c.set.filter(x => aTypes.contains(x.id.typ))
-          val cComplement = c.set.filter(x => !aTypes.contains(x.id.typ))
-          if (cComplement.isEmpty)
-            return Entities(Entity(z(z(b, cIntersection), a), m))
-          else
-            return Entities(Entity(z(z(b, cIntersection), a), m), Entity(cComplement, c.data))
-        } else if (maxTime(a) >= maxTime(c))
-          return Entities(Entity(z(z(b, c), a), m))
-        else
-          return Entities(Entity(z(z(b, c), a), c.data))
-      }
-    }
-  }
 
   /**
    * Returns the result of merging the identifiers in ''a'' (max 2) with ''b'' and ''c''.
@@ -378,88 +477,6 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
   private[viem] def find(entities: Set[Entity], id: Identifier): Entity =
     entities.find(y => y.set.map(_.id).contains(id)).get
 
-  /**
-   * Returns the [[viem.Entity]]s which are the result of adding ''a'' to the ''matches''.
-   * @param a
-   * @param matches
-   * @return
-   */
-  def merge(a: Entity, matches: Set[Entity]): Set[Entity] = {
-    //check some preconditions
-    require(a != null, "parameter 'a' cannot be null")
-    require(matches != null, "matches cannot be null")
-    require(!a.isEmpty, "'a' must have at least one identifier")
-    require(matches.isEmpty || matches.filter(_.map(_.id).intersect(a.map(_.id)).isEmpty).isEmpty,
-      "every Entity in matches must have an intersection with a in terms of [[viem.Identifier]]")
-    require(matches.isEmpty || matches.map(_.set).flatten.map(_.id).size == matches.map(_.set).flatten.size,
-      "elements of matches must be mutually non intersecting n terms of [[viem.Identifier]]")
-
-    //if no matches the just return the set A back
-    if (matches.isEmpty) return Set(a)
-
-    //sort the list in descending strength of identifier
-    val list = a.set.toList.sortWith((x, y) => (x compare y) < 0)
-
-    println("adding " + list)
-
-    //obtain an iterator for the identifiers and the first element of the list
-    val iterator = list.iterator
-
-    //preconditions have checked that iterator has at least one element
-    val firstId = iterator.next();
-
-    //initialize the Group object to pass into the recursive method
-    val group = Group(matches, EntityAndId(find(matches, firstId.id), firstId))
-
-    //use recursion to run through the iterator performing merges
-    val g = findGroup(a.data, group, firstId, iterator)
-
-    //return the merged entities
-    return g.entities
-  }
-
-  private def findGroup(data: Data, group: Group, x: TimedIdentifier, iterator: Iterator[TimedIdentifier]): Group = {
-    println("merging " + x)
-
-    val entity = find(group.entities, x.id)
-    val prevEntity = find(group.entities, group.previous.id.id)
-    val prev = EntityAndId(prevEntity, group.previous.id)
-    //attempt the merge
-    val result = merge(prev.id, x, data, prev.entity, entity)
-
-    result match {
-      //merge succeeded
-      case r: Entities => {
-        val entities = group.entities - prev.entity - entity ++ r.set
-        val g = Group(entities, EntityAndId(entity, x))
-        if (iterator.hasNext)
-          findGroup(data, g, iterator.next, iterator)
-        else g
-      }
-      //merge deemed invalid
-      case InvalidMerge(data) => {
-        //remove problem identifiers from data which is 
-        //one of entity or previous
-        val entities = group.entities - prev.entity - entity +
-          removeIdentifierIfNotOnly(prev.entity, x.id) +
-          removeIdentifierIfNotOnly(entity, x.id)
-
-        if (prev.entity == entity) {
-          if (iterator.hasNext) {
-            val y = iterator.next
-            val g = Group(entities, EntityAndId(find(entities, y.id), y))
-            findGroup(data, g, y, iterator)
-          } else
-            // none left, return what we've got
-            Group(entities, group.previous)
-        } else {
-          //don't advance the iterator, throw away previous identifier
-          val g = Group(entities, EntityAndId(entity, x))
-          findGroup(data, g, x, iterator)
-        }
-      }
-    }
-  }
 }
 
 /**
@@ -504,14 +521,13 @@ trait Entries[T] {
  * @author davidmoten
  *
  */
-case class MemoryEntries(entries: Set[Entity], merger: Merger) extends Entries[MemoryEntries] {
+case class MemoryEntries(entries: Set[Entity], merger: Merger)
+  extends Entries[MemoryEntries] {
   //make a map of identifier to entity to speed lookup
-  val map = Map.empty[Identifier, Entity] ++ entries.flatMap(x => x.set.map(y => (y.id, x)))
+  val map = Map.empty[Identifier, Entity] ++
+    entries.flatMap(x => x.set.map(y => (y.id, x)))
 
-  def find(id: Identifier) = {
-    //  entries.find(x => x.set.map(_.id).contains(id))
-    map.get(id)
-  }
+  def find(id: Identifier) = map.get(id)
 
   def add(a: Entity) = {
     val matches = a.set.map(_.id).flatMap(find _)
