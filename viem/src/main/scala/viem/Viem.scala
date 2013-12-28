@@ -23,7 +23,6 @@ case class IdentifierType(name: String) extends Ordered[IdentifierType] {
 }
 
 /**
- *
  * An identifier for e.g. an [[viem.Entity]] composed of an [[viem.IdentifierType]]
  * and a [[java.lang.String]] value. Has strict ordering based on
  * [[viem.IdentifierType]] ordering then value alphabetical ordering.
@@ -519,7 +518,6 @@ trait Entries[T] {
 /**
  * Holds the latest merged entities in memory.
  * @author davidmoten
- *
  */
 case class MemoryEntries(entries: Set[Entity], merger: Merger)
   extends Entries[MemoryEntries] {
@@ -536,4 +534,3 @@ case class MemoryEntries(entries: Set[Entity], merger: Merger)
     MemoryEntries(mergedEntries, merger)
   }
 }
-
