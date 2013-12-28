@@ -2,18 +2,17 @@ package viem
 
 /**
  * Volatile Identifier Entity Matching (VIEM) is an algorithm for matching identities
- * based on mostly unique identifiers that change over time and incorporates a correction 
+ * based on mostly unique identifiers that change over time and incorporates a correction
  * mechanism for conflicting identifiers.
  */
 object `package` {}
 
 import java.util.Date
-import scala.collection.immutable._
 import viem.Merger._
 
 /**
  * The type of an [[viem.Identifier]]. For an example for a ship it might
- * be the MMSI number, so we might use [[viem.IdentifierType]]("MMSI"). 
+ * be the MMSI number, so we might use [[viem.IdentifierType]]("MMSI").
  * Has strict ordering, reverse alphabetical at the moment.
  *
  * @param name the identitier type nameMergeResult(empty,Entity(z))
@@ -37,7 +36,7 @@ case class Identifier(typ: IdentifierType, value: String) extends Ordered[Identi
       this.typ.compare(that.typ)
 }
 
-/** 
+/**
  * An [[viem.Identifier]] with a [[scala.math.BigDecimal]] timestamp. Might be used to identify an [[viem.Entity]] at a given time.
  */
 case class TimedIdentifier(id: Identifier, time: BigDecimal) extends Ordered[TimedIdentifier] {
@@ -52,8 +51,8 @@ case class TimedIdentifier(id: Identifier, time: BigDecimal) extends Ordered[Tim
 /**
  * Ancillary data normally for an [[viem.Entity]]. Would be used to hold an entityId
  * for example. In a position tracking system might hold entityId, time,
- * lat and long so that a [[viem.MergeValidator]] can compare two 
- * [[viem.Entity]]s based on their [[viem.Data]] and that further 
+ * lat and long so that a [[viem.MergeValidator]] can compare two
+ * [[viem.Entity]]s based on their [[viem.Data]] and that further
  * the Entity can be associated with some persisted object (using the entityId).
  */
 trait Data
@@ -67,7 +66,7 @@ case class Entity(set: Set[TimedIdentifier], data: Data) {
 }
 
 /**
- * The result of a merge. This trait is sealed so that all its 
+ * The result of a merge. This trait is sealed so that all its
  * implementations must come from this class.
  * @author davidmoten
  *
@@ -76,11 +75,11 @@ sealed trait Result
 
 /**
  * Invalid merge result.
- * 
- * @param ''data'' is the [[viem.Data]] of the set that provoked the invalid merge. 
- * For ''a'' against primary match ''b'' it will be ''b.data''. For ''a'' 
- * against secondary match ''c'' it will be ''c.data''. For ''b'' against 
- * ''c'' it will be the meta of the weaker identifier set, that is c.data. 
+ *
+ * @param ''data'' is the [[viem.Data]] of the set that provoked the invalid merge.
+ * For ''a'' against primary match ''b'' it will be ''b.data''. For ''a''
+ * against secondary match ''c'' it will be ''c.data''. For ''b'' against
+ * ''c'' it will be the meta of the weaker identifier set, that is c.data.
  *
  */
 case class InvalidMerge(meta: Data) extends Result
@@ -114,9 +113,9 @@ abstract trait MergeValidator {
  * Merges entity with matching entities.
  *
  */
-abstract trait MergerLike {
+trait MergerLike {
   /**
-   * Returns the result of merging [[viem.Entity]] ''a'' with the entities that it matches 
+   * Returns the result of merging [[viem.Entity]] ''a'' with the entities that it matches
    * (found by matching [[viem.Identifier]]s).
    * @param a
    * @param matches
@@ -139,15 +138,14 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
 
   /**
    * Returns ''y'' and the member of set ''x'' that matches the [[viem.IdentifierType]] of
-   * ''y'' as a two element set if and only the type matching item in ''x'' was found, or a one element 
+   * ''y'' as a two element set if and only the type matching item in ''x'' was found, or a one element
    * set if the item in ''x'' with matching [[viem.IdentifierType]] was not found.
    * @param x
    * @param y
    * @return
    */
   private[viem] def alpha(x: Set[TimedIdentifier], y: TimedIdentifier): Set[TimedIdentifier] = {
-    val set = x.filter(_.id.typ == y.id.typ)
-    set.union(Set(y))
+   x.filter(_.id.typ == y.id.typ) + y
   }
 
   /**
@@ -158,11 +156,8 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    * @return
    */
   private[viem] def typeMatch(x: Set[TimedIdentifier], y: TimedIdentifier): TimedIdentifier = {
-    val a = x.find(_.id.typ == y.id.typ)
-    a match {
-      case t: Some[TimedIdentifier] => t.get
-      case None => error("matching identifier type not found:" + y + " in " + x)
-    }
+    lazy val msg = "matching identifier type not found:" + y + " in " + x
+    x.find(_.id.typ == y.id.typ).getOrElse(error(msg))
   }
 
   /**
@@ -175,13 +170,13 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    */
   private[viem] def z(x: Set[TimedIdentifier], y: TimedIdentifier): Set[TimedIdentifier] = {
     val a = alpha(x, y)
-    x.diff(a).union(Set(a.max))
+    x.diff(a) + a.max
   }
 
   /**
    * Combines a set of [[viem.TimedIdentifier]] with another set  of [[viem.TimedIdentifier]].
    * Ensures that if the identifier types in ''y'' exist in x that the returned set only contains
-   * the latest identifiers from x and y of that type unioned with all other identifiers in x 
+   * the latest identifiers from x and y of that type unioned with all other identifiers in x
    * that don't have an identifier type in y.
    * @param x
    * @param y
@@ -197,7 +192,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
   }
 
   /**
-   * Returns true if and only if the time of x is greater or equal to the time of 
+   * Returns true if and only if the time of x is greater or equal to the time of
    * the identifier in y with the same identifier type. If the identifier type of x
    * does not exist in y then a [[java.lang.RuntimeException]] is thrown.
    * @param x
@@ -205,7 +200,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
    * @return
    */
   private[viem] def >=(x: TimedIdentifier, y: Set[TimedIdentifier]): Boolean = {
-    return x.time >= typeMatch(y, x).time
+    x.time >= typeMatch(y, x).time
   }
 
   /**
@@ -216,7 +211,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
   private[viem] def maxTime(set: Set[TimedIdentifier]): BigDecimal = set.map(_.time).max
 
   /**
-   * Returns the result of merging ''a1'' with associated metadata ''m'' with 
+   * Returns the result of merging ''a1'' with associated metadata ''m'' with
    * the set ''b''. ''b'' is expected to have an identifier with type and value of a1.
    * @param a1
    * @param m
@@ -253,8 +248,8 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
   }
 
   /**
-   * Returns true if and only if latest time from ''x'' is strictly 
-   * later than the latest time from ''y''. 
+   * Returns true if and only if latest time from ''x'' is strictly
+   * later than the latest time from ''y''.
    * @param x
    * @param y
    * @return
@@ -264,7 +259,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
 
   /**
    * Returns the result of the merge of a1 and a2 with associated metadata m,
-   * with the sets b and c. a1 must be in b and a2 must be in c (although 
+   * with the sets b and c. a1 must be in b and a2 must be in c (although
    * possibly with different times).
    * @param a1
    * @param a2
@@ -337,7 +332,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
   }
 
   /**
-   *Returns the result of merging the identifiers in ''a'' (max 2) with ''b'' and ''c''.
+   * Returns the result of merging the identifiers in ''a'' (max 2) with ''b'' and ''c''.
    * @param a
    * @param b
    * @param c
@@ -375,7 +370,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
 
   /**
    * Returns the [[viem.Entity]] that matches the given [[viem.Identifier]].
-   * 
+   *
    * @param entities
    * @param id
    * @return
@@ -393,7 +388,7 @@ class Merger(validator: MergeValidator, onlyMergeIfStrongestIdentifierOfSecondar
     //check some preconditions
     require(a != null, "parameter 'a' cannot be null")
     require(matches != null, "matches cannot be null")
-    require(a.size > 0, "'a' must have at least one identifier")
+    require(!a.isEmpty, "'a' must have at least one identifier")
     require(matches.isEmpty || matches.filter(_.map(_.id).intersect(a.map(_.id)).isEmpty).isEmpty,
       "every Entity in matches must have an intersection with a in terms of [[viem.Identifier]]")
     require(matches.isEmpty || matches.map(_.set).flatten.map(_.id).size == matches.map(_.set).flatten.size,
