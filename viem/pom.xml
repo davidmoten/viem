@@ -11,7 +11,7 @@
 	<description>Scala implementation of the VIEM algorithm</description>
 	<inceptionYear>2008</inceptionYear>
 	<properties>
-		<scala.version>2.10.2</scala.version>
+		<scala.version>2.10.3</scala.version>
 	</properties>
 
 	<dependencies>
