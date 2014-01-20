@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<name>viem-parent</name>
 	<description>Parent project for viem projects</description>
-		<properties>
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<site.url>file://${user.home}/Development/site</site.url>
 	</properties>
