@@ -213,6 +213,8 @@ class Merger(validator: MergeValidator,
             Group(entities, group.previous)
         } else {
           //don't advance the iterator, throw away previous identifier
+          //this action means that this recursive procedure over an iterator 
+          //could not be done with a foldLeft for instance.
           val g = Group(entities, EntityAndId(entity, x))
           findGroup(data, g, x, iterator)
         }
