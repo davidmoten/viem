@@ -345,6 +345,13 @@ class ViemTest {
   }
 
   @Test
+  def testMerge9() {
+    println("merge (a1,b1) with (b1old)")
+    assertEquals(Set(Entity(Set(a1, a2), mda)),
+      merger.merge(Entity(Set(a1, a2), mda), Set(Entity(Set(a2old), mdb))))
+  }
+
+  @Test
   def testMemoryEntries {
     println("testing memory entities")
     var m = MemoryEntries(Set(Entity(Set(a1, a2), mda)), merger)

@@ -166,7 +166,7 @@ class Merger(validator: MergeValidator,
     val firstId = iterator.next();
 
     //initialize the Group object to pass into the recursive method
-    val group = Group(matches, EntityAndId(find(matches, firstId.id), firstId))
+    val group = Group(matches, EntityAndId(find(matches, firstId.id).get, firstId))
 
     //use recursion to run through the iterator performing merges
     val g = findGroup(a.data, group, firstId, iterator)
@@ -182,15 +182,15 @@ class Merger(validator: MergeValidator,
     //TODO what if entity not found?
     val entity = find(group.entities, x.id)
     val prevEntity = find(group.entities, group.previous.id.id)
-    val prev = EntityAndId(prevEntity, group.previous.id)
+    val prev = EntityAndId(prevEntity.get, group.previous.id)
     //attempt the merge
-    val result = merge(prev.id, x, data, prev.entity, entity)
+    val result = merge(prev.id, x, data, prev.entity, entity.get)
 
     result match {
       //merge succeeded
       case r: Entities => {
-        val entities = group.entities - prev.entity - entity ++ r.set
-        val g = Group(entities, EntityAndId(entity, x))
+        val entities = group.entities - prev.entity - entity.get ++ r.set
+        val g = Group(entities, EntityAndId(entity.get, x))
         if (iterator.hasNext)
           findGroup(data, g, iterator.next, iterator)
         else
@@ -200,14 +200,14 @@ class Merger(validator: MergeValidator,
       case InvalidMerge(data) => {
         //remove problem identifiers from data which is 
         //one of entity or previous
-        val entities = group.entities - prev.entity - entity +
+        val entities = group.entities - prev.entity - entity.get +
           removeIdentifierIfNotOnly(prev.entity, x.id) +
-          removeIdentifierIfNotOnly(entity, x.id)
+          removeIdentifierIfNotOnly(entity.get, x.id)
 
         if (prev.entity == entity) {
           if (iterator.hasNext) {
             val y = iterator.next
-            val g = Group(entities, EntityAndId(find(entities, y.id), y))
+            val g = Group(entities, EntityAndId(find(entities, y.id).get, y))
             findGroup(data, g, y, iterator)
           } else
             // none left, return what we've got
@@ -216,7 +216,7 @@ class Merger(validator: MergeValidator,
           //don't advance the iterator, throw away previous identifier
           //this action means that this recursive procedure over an iterator 
           //could not be done with a foldLeft for instance.
-          val g = Group(entities, EntityAndId(entity, x))
+          val g = Group(entities, EntityAndId(entity.get, x))
           findGroup(data, g, x, iterator)
         }
       }
@@ -462,8 +462,8 @@ class Merger(validator: MergeValidator,
    * @param id
    * @return
    */
-  private[viem] def find(entities: Set[Entity], id: Identifier): Entity =
-    entities.find(y => { val s = y.set.map(_.id); println("s=" + s); val result = s.contains(id); result }).get
+  private[viem] def find(entities: Set[Entity], id: Identifier): Option[Entity] =
+    entities.find(y => y.set.map(_.id).contains(id))
 
 }
 
