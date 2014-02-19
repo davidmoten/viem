@@ -178,7 +178,8 @@ class Merger(validator: MergeValidator,
   private def findGroup(data: Data, group: Group, x: TimedIdentifier,
     iterator: Iterator[TimedIdentifier]): Group = {
     println("merging " + x)
-
+    println("group.entities=" + group.entities.map(_.toString).mkString("\n"))
+    //TODO what if entity not found?
     val entity = find(group.entities, x.id)
     val prevEntity = find(group.entities, group.previous.id.id)
     val prev = EntityAndId(prevEntity, group.previous.id)
@@ -432,20 +433,6 @@ class Merger(validator: MergeValidator,
     x.map(_.time).max > y.map(_.time).max
 
   /**
-   * Returns the result of merging the identifiers in ''a'' (max 2) with ''b'' and ''c''.
-   * @param a
-   * @param b
-   * @param c
-   * @return
-   */
-  private[viem] def mergePair(a: Entity, b: Entity, c: Entity): Result = {
-    assert(a.size <= 2, "a must have a size of 2 or less")
-    if (a.isEmpty) Entities(b, c)
-    else if (a.size == 1) merge(a.max, a.max, a.data, b, c)
-    else merge(a.max, a.min, a.data, b, c)
-  }
-
-  /**
    * Returns the same [[viem.Entity]] if it has only one identifier otherwise returns a new [[viem.Entity]]
    * with the identifier ''id'' removed.
    * @param entity
@@ -476,7 +463,7 @@ class Merger(validator: MergeValidator,
    * @return
    */
   private[viem] def find(entities: Set[Entity], id: Identifier): Entity =
-    entities.find(y => y.set.map(_.id).contains(id)).get
+    entities.find(y => { val s = y.set.map(_.id); println("s=" + s); val result = s.contains(id); result }).get
 
 }
 

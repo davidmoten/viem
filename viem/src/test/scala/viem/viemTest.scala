@@ -30,7 +30,7 @@ class ViemTest {
     value match {
       case InvalidMerge(_) => error("invalid merge")
       case _ => {
-    	println("actual:")
+        println("actual:")
         println(pp(value))
         if (!(expected equals value))
           println("expected:\n" + pp(expected))
@@ -114,7 +114,7 @@ class ViemTest {
     assertEquals(Set(a2), merger.alpha(Set(a1), a2))
 
     println("testing complement")
-    assertEquals(Set(a1),Set(a1, a2) diff Set(a2))
+    assertEquals(Set(a1), Set(a1, a2) diff Set(a2))
     assertEquals(Set(a2), Set(a1, a2) diff Set(a1))
     assertEquals(Set(a1, a2), Set(a1, a2) diff Set(a1old))
     assertEquals(Set(), Set(a1, a2) diff Set(a1, a2))
@@ -162,7 +162,7 @@ class ViemTest {
 
     println("add (a1) to a system with newer (a1)")
     r = merger.merge(a1old, a1old, mda, Entity(Set(a1), mdb), empty)
-    checkEquals(Entities( Entity(Set(a1), mdb)), r)
+    checkEquals(Entities(Entity(Set(a1), mdb)), r)
 
     println("add (a1, a2) to a system with (newer a1)")
     r = merger.merge(a1old, a2old, mda, Entity(Set(a1), mdb), empty)
@@ -276,20 +276,20 @@ class ViemTest {
     println("merge (a1) with (a2)")
     merger.merge(Entity(Set(a1), mda), Set(Entity(Set(a2), mdb)))
   }
-  
+
   @Test(expected = classOf[IllegalArgumentException])
   def testNullArgumentsProvokeException1 {
-	  merger.merge(null,null)
+    merger.merge(null, null)
   }
-  
+
   @Test(expected = classOf[IllegalArgumentException])
   def testNullArgumentsProvokeException2() {
     merger.merge(null, Set(Entity(Set(a2), mdb)))
   }
-  
+
   @Test(expected = classOf[IllegalArgumentException])
   def testNullArgumentsProvokeException3() {
-    merger.merge(Entity(Set(a2), mdb),null)
+    merger.merge(Entity(Set(a2), mdb), null)
   }
 
   @Test
@@ -307,12 +307,12 @@ class ViemTest {
       Set(Entity(Set(a1, a2), mdb)),
       merger.merge(Entity(Set(a1old), mda), Set(Entity(Set(a1, a2), mdb))))
   }
-  
+
   @Test
   def testEmptyMatchesReturnsSetOfA() {
-	  println("emtpy matches returns set of A")
-	  assertEquals(Set(Entity(Set(a1),mda)),
-	 		 merger.merge(Entity(Set(a1),mda),Set()))
+    println("emtpy matches returns set of A")
+    assertEquals(Set(Entity(Set(a1), mda)),
+      merger.merge(Entity(Set(a1), mda), Set()))
   }
 
   @Test
@@ -322,26 +322,33 @@ class ViemTest {
       Set(Entity(Set(a1, a2), mda)),
       merger.merge(Entity(Set(a1), mda), Set(Entity(Set(a1, a2), mdb))))
   }
-  
-  private def checkEquals(x:Set[Entity],y:Set[Entity]) {
-      println(x)
-      println(y)
-      assertEquals(x,y)
+
+  private def checkEquals(x: Set[Entity], y: Set[Entity]) {
+    println(x)
+    println(y)
+    assertEquals(x, y)
   }
-  
+
   @Test
   def testMerge7() {
     println("merge (a1,a2) with (a1old),(a2old)")
     checkEquals(
       Set(Entity(Set(a1, a2), mda)),
-      merger.merge(Entity(Set(a1,a2), mda), Set(Entity(Set(a1old), mdb),Entity(Set(a2old),mdc))))
+      merger.merge(Entity(Set(a1, a2), mda), Set(Entity(Set(a1old), mdb), Entity(Set(a2old), mdc))))
   }
-  
+
+  @Test
+  def testMerge8() {
+    println("merge (a1,a2) with (a1old)")
+    assertEquals(Set(Entity(Set(a1, a2), mda)),
+      merger.merge(Entity(Set(a1, a2), mda), Set(Entity(Set(a1old), mdb))))
+  }
+
   @Test
   def testMemoryEntries {
-      println("testing memory entities")
-      var m = MemoryEntries(Set(Entity(Set(a1,a2),mda)), merger)
-      println(m.add(Entity(Set(a3),mdb)))
+    println("testing memory entities")
+    var m = MemoryEntries(Set(Entity(Set(a1, a2), mda)), merger)
+    println(m.add(Entity(Set(a3), mdb)))
   }
 }
 
