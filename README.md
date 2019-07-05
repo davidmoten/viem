@@ -8,7 +8,7 @@ We want to resolve this information into a latest positions layer. Ideally we on
 
 Craft positions come in with a type (vessel, aircraft, vehicle, tracking device, and others), and one or more identifiers. Identifiers are key-value pairs like ["MMSI","123456789"] (MMSI is a vessel identifier).
 
-The notion of a physical craft (or entity) is an important one. For a ship, the physical craft is the hull, for an aircraft the airframe, for a vehicle the chassis. 
+For a ship, the physical craft is the hull, for an aircraft the airframe, for a vehicle the chassis. 
 
 Identifiers are often volatile in terms of their relationship with a phsyical craft. For example a car has a chassis number imprinted on the frame. This number can be seen as a permanent identifier for the car. However, a licence plate (registration number) is not so permanent. It acts as a great identifier for the car right up  to the point where the plates are handed in or moved to another car. We see that the chassis number is a more reliable identifier for the car than the licence plate and we are going to represent this reliability relationship by demanding that every craft (entity) type has a strict confidence ordering on the allowable identifier types for that craft type. 
 
