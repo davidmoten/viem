@@ -23,11 +23,11 @@ public interface System<K, V, M> {
             Set<EntityState<K, V, M>> newEntityStates);
 
     default EntityState<K, V, M> createEntityState(Map<K, V> identifiers, M metadata) {
-        return new EntityStateDefault<K, V, M>(identifiers, metadata);
+        return EntityState.create(identifiers, metadata);
     }
 
     default KeyValue<K, V> createKeyValue(K key, V value) {
-        return new KeyValueDefault<K, V>(key, value);
+        return KeyValue.create(key, value);
     }
 
     default System<K, V, M> merge(EntityState<K, V, M> entity) {
