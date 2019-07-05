@@ -19,18 +19,25 @@ public interface System<K, V, M> {
 
     M merge(M a, M b);
 
-    EntityState<K, V, M> createEntityState(Map<K, V> identifiers, M metadata);
+    System<K, V, M> update(List<EntityState<K, V, M>> matches,
+            Set<EntityState<K, V, M>> newEntityStates);
 
-    System<K, V, M> update(List<EntityState<K, V, M>> matches, Set<EntityState<K, V, M>> newEntityStates);
+    default EntityState<K, V, M> createEntityState(Map<K, V> identifiers, M metadata) {
+        return new EntityStateDefault<K, V, M>(identifiers, metadata);
+    }
+
+    default KeyValue<K, V> createKeyValue(K key, V value) {
+        return new KeyValueDefault<K, V>(key, value);
+    }
 
     default System<K, V, M> merge(EntityState<K, V, M> entity) {
         MergeResult<K, V, M> r = Util.merge(this, entity);
         return update(r.matches, r.newEntityStates);
     }
 
-    default Set<EntityState<K,V,M>> toSet()  {
-        Set<EntityState<K,V,M>> set = new HashSet<>();
-        for (EntityState<K, V, M> es:entityStates()) {
+    default Set<EntityState<K, V, M>> toSet() {
+        Set<EntityState<K, V, M>> set = new HashSet<>();
+        for (EntityState<K, V, M> es : entityStates()) {
             set.add(es);
         }
         return set;
