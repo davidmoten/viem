@@ -16,7 +16,8 @@ final class Util {
         // prevent instantiation
     }
 
-    static <K, V, M> EntityState<K, V, M> min(System<K, V, M> system, EntityState<K, V, M> a, EntityState<K, V, M> b) {
+    static <K, V, M> EntityState<K, V, M> min(System<K, V, M> system, EntityState<K, V, M> a,
+            EntityState<K, V, M> b) {
         if (system.metadataGreaterThan(a.metadata(), b.metadata())) {
             return b;
         } else {
@@ -24,7 +25,8 @@ final class Util {
         }
     }
 
-    static <K, V, M> EntityState<K, V, M> max(System<K, V, M> system, EntityState<K, V, M> a, EntityState<K, V, M> b) {
+    static <K, V, M> EntityState<K, V, M> max(System<K, V, M> system, EntityState<K, V, M> a,
+            EntityState<K, V, M> b) {
         if (system.metadataGreaterThan(a.metadata(), b.metadata())) {
             return a;
         } else {
@@ -109,7 +111,8 @@ final class Util {
             Map<K, V> i3 = Util.exclusive(p, f);
             EntityState<K, V, M> min = Util.min(system, p, f);
             EntityState<K, V, M> max = Util.max(system, p, f);
-            if (Util.greaterThan(system, i1.keySet(), i2.keySet()) && system.mergeable(p.metadata(), f.metadata())) {
+            if (Util.greaterThan(system, i1.keySet(), i2.keySet())
+                    && system.mergeable(p.metadata(), f.metadata())) {
                 Map<K, V> ids = new HashMap<>();
                 ids.putAll(max.identifiers());
                 ids.putAll(i3);
@@ -129,7 +132,7 @@ final class Util {
                 p = max;
             }
         }
-            set.add(p);
+        set.add(p);
         return new MergeResult<K, V, M>(matches, set);
     }
 
