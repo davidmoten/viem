@@ -1,4 +1,8 @@
 # Volatile Identifier Entity Matching v2 (viem2)
+<a href="https://travis-ci.org/davidmoten/viem"><img src="https://travis-ci.org/davidmoten/viem.svg"/></a><br/>
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/viem/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/viem)<br/>
+[![codecov](https://codecov.io/gh/davidmoten/viem/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmoten/viem)<br/>
+
 An algorithm and a java library for handling entity matching when entities can have multiple identifiers each of which is potentially volatile (having a non-permanent lifecycle).
 
 ## Problem statement
