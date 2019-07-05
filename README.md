@@ -5,6 +5,8 @@
 
 An algorithm and a java library for handling entity matching when entities can have multiple identifiers each of which is potentially volatile (having a non-permanent lifecycle).
 
+Status: *pre-alpha*
+
 ## Problem statement
 My workplace has multiple sources of craft (vessel, aircraft, vehicle, tracking device, beacons) information coming in as timestamped geographic positions with metadata.
 
