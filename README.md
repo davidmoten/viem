@@ -116,3 +116,5 @@ The above algorithm has been implemented in Java (for reuse) and has been tested
 
 ## Using this algorithm
 The algorithm has been abstracted substantially. You will need to make implementations of `KeyValue`, `EntityState`,`System`. The `System` class has a default method that implements the algorithm above and mutates or returns a new `System` on arrival of a new `EntityState`. The use of immutability, data structures and lookup is largely up to you (`System.merge` method may return the same System or a new one). 
+
+
