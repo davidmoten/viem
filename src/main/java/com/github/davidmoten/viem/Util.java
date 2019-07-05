@@ -104,9 +104,6 @@ final class Util {
                 });
         EntityState<K, V, M> p = e;
         for (EntityState<K, V, M> f : matches) {
-            if (p.identifiers().isEmpty()) {
-                break;
-            }
             Map<K, V> i1 = Util.common(p, f);
             Map<K, Pair<V>> i2 = Util.conflicting(p, f);
             Map<K, V> i3 = Util.exclusive(p, f);
