@@ -1,7 +1,9 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.github.davidmoten.viem.EntityState;
 
 final class EntityStateImpl implements EntityState<String, String, Long> {
 

@@ -1,10 +1,13 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.github.davidmoten.viem.EntityState;
+import com.github.davidmoten.viem.System;
 
 final class SystemImpl implements System<String, String, Long> {
 

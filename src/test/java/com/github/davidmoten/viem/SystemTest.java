@@ -1,4 +1,4 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+
+import com.github.davidmoten.viem.EntityState;
 
 public class SystemTest {
 

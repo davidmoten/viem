@@ -1,4 +1,4 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 public interface KeyValue<K, V> {
     

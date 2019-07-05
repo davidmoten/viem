@@ -1,8 +1,9 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 import org.junit.Test;
 
 import com.github.davidmoten.junit.Asserts;
+import com.github.davidmoten.viem.Util;
 
 public class UtilTest {
     

@@ -1,4 +1,6 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
+
+import com.github.davidmoten.viem.KeyValue;
 
 final class KeyValueImpl implements KeyValue<String, String> {
 

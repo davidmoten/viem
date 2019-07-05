@@ -1,4 +1,4 @@
-package com.github.davidmoten.viem2;
+package com.github.davidmoten.viem;
 
 import java.util.HashSet;
 import java.util.List;
