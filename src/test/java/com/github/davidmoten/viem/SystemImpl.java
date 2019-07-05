@@ -61,11 +61,6 @@ final class SystemImpl implements System<String, String, Long> {
     }
 
     @Override
-    public EntityState<String, String, Long> createEntityState(Map<String, String> identifiers, Long metadata) {
-        return new EntityStateImpl(identifiers, metadata);
-    }
-
-    @Override
     public Iterable<EntityState<String, String, Long>> entityStates() {
         return set;
     }

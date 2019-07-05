@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
-
-import com.github.davidmoten.viem.EntityState;
 
 public class SystemTest {
 
@@ -29,7 +29,7 @@ public class SystemTest {
     public void testSimpleNewAfter() {
         assertEquals(set(es(2, "A1")), system(es(1, "A1")).merge(es(2, "A1")).toSet());
     }
-    
+
     @Test
     public void testSimpleNewAfterNoMerge() {
         SystemImpl sys = system(es(1, "A1"));
@@ -54,27 +54,32 @@ public class SystemTest {
 
     @Test
     public void testSecondaryIdOnOlderChuckedInMerge() {
-        assertEquals(set(es(2, "A1", "B2")), system(es(2, "A1", "B2")).merge(es(1, "A1", "B1")).toSet());
+        assertEquals(set(es(2, "A1", "B2")),
+                system(es(2, "A1", "B2")).merge(es(1, "A1", "B1")).toSet());
     }
 
     @Test
     public void testSecondaryIdOnOlderChuckedInMergeArrivalBefore() {
-        assertEquals(set(es(2, "A1", "B1")), system(es(1, "A1", "B2")).merge(es(2, "A1", "B1")).toSet());
+        assertEquals(set(es(2, "A1", "B1")),
+                system(es(1, "A1", "B2")).merge(es(2, "A1", "B1")).toSet());
     }
 
     @Test
     public void testNewIdCarriedThrough() {
-        assertEquals(set(es(2, "A1", "B1", "C1")), system(es(1, "A1", "B1")).merge(es(2, "A1", "B1", "C1")).toSet());
+        assertEquals(set(es(2, "A1", "B1", "C1")),
+                system(es(1, "A1", "B1")).merge(es(2, "A1", "B1", "C1")).toSet());
     }
 
     @Test
     public void testNewIdCarriedThrough2() {
-        assertEquals(set(es(2, "A1", "B1", "C1")), system(es(2, "A1", "B1")).merge(es(1, "A1", "B1", "C1")).toSet());
+        assertEquals(set(es(2, "A1", "B1", "C1")),
+                system(es(2, "A1", "B1")).merge(es(1, "A1", "B1", "C1")).toSet());
     }
 
     @Test
     public void testMergeOfSecondaryMatchIsRejected() {
-        assertEquals(set(es(0, "A1"), es(1, "A2", "B1")), system(es(1, "A2", "B1")).merge(es(0, "A1", "B1")).toSet());
+        assertEquals(set(es(0, "A1"), es(1, "A2", "B1")),
+                system(es(1, "A2", "B1")).merge(es(0, "A1", "B1")).toSet());
     }
 
     @Test
@@ -85,20 +90,28 @@ public class SystemTest {
                         .merge(es(2, "A1", "B1", "C1")).toSet());
     }
 
-    private EntityStateImpl es(String... s) {
-        return EntityStateImpl.create(1, s);
+    private static EntityState<String, String, Long> es(long timestamp, String... strings) {
+        Map<String, String> map = Arrays.stream(strings)
+                .collect(Collectors.toMap(s -> s.substring(0, 1), s -> s.substring(1, 2)));
+        return EntityState.create(map, timestamp);
     }
 
-    private EntityStateImpl es(long timestamp, String... s) {
-        return EntityStateImpl.create(timestamp, s);
-    }
-
-    private SystemImpl system(EntityStateImpl... entityStates) {
-        return SystemImpl.create(entityStates);
+    private static EntityState<String, String, Long> es(String... strings) {
+        return es(0, strings);
     }
 
     @SafeVarargs
-    private static Set<EntityState<String, String, Long>> set(EntityState<String, String, Long>... entityStates) {
+    private static SystemImpl system(EntityState<String, String, Long>... entityStates) {
+        System<String, String, Long> s = SystemImpl.create();
+        for (EntityState<String, String, Long> e : entityStates) {
+            s = s.merge(e);
+        }
+        return (SystemImpl) s;
+    }
+
+    @SafeVarargs
+    private static Set<EntityState<String, String, Long>> set(
+            EntityState<String, String, Long>... entityStates) {
         return new HashSet<EntityState<String, String, Long>>(Arrays.asList(entityStates));
     }
 
