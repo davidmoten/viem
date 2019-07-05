@@ -29,6 +29,13 @@ public class SystemTest {
     public void testSimpleNewAfter() {
         assertEquals(set(es(2, "A1")), system(es(1, "A1")).merge(es(2, "A1")).toSet());
     }
+    
+    @Test
+    public void testSimpleNewAfterNoMerge() {
+        SystemImpl sys = system(es(1, "A1"));
+        sys.mergeable = false;
+        assertEquals(set(es(2, "A1")), sys.merge(es(2, "A1")).toSet());
+    }
 
     @Test
     public void testSimpleNewBefore() {
