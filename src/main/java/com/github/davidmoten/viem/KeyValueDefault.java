@@ -1,6 +1,6 @@
 package com.github.davidmoten.viem;
 
-public final class KeyValueDefault<K, V> implements KeyValue<K, V> {
+final class KeyValueDefault<K, V> implements KeyValue<K, V> {
 
     private final K key;
     private final V value;

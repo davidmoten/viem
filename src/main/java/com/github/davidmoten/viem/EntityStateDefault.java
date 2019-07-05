@@ -2,7 +2,7 @@ package com.github.davidmoten.viem;
 
 import java.util.Map;
 
-public final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
+final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
 
     private final Map<K, V> map;
     private final M metadata;
