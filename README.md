@@ -1,4 +1,4 @@
-# Volatile Identifier Entity Matching v2 (viem2)
+# Volatile Identifier Entity Matching 
 <a href="https://travis-ci.org/davidmoten/viem"><img src="https://travis-ci.org/davidmoten/viem.svg"/></a><br/>
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/viem/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/viem)<br/>
 [![codecov](https://codecov.io/gh/davidmoten/viem/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmoten/viem)<br/>
