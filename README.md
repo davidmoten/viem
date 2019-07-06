@@ -43,7 +43,7 @@ A *system* of entity-states has
 * zero or more entity-states
 * identifier uniqueness across all entity-states (no entity-state can have the same identifier key-value as another)
 * a strict ordering on entity-states (not necessarily within the system) that allows us to determine which report to have more confidence in. For the latest craft positions use case we would use the latest position timestamp (later timestamp is presumed to be more reliable).
-* a strict ordering on identifier keys that indicates which identifiers to have more confidence in.
+* a strict ordering on identifier keys that indicates which identifiers to have more confidence in. The strict ordering only needs to apply for groups of identifiers that can appear together on an entity-state (we don't need to be able to compare a vessel identifier with a vehicle identifier for example).
 
 We want to define exactly how a *system* mutates when a new entity-state is resolved with it. For the latest craft position scenario this might be a new timestamped position with identifiers that we resolve against the set of existing timestamped positions. *Resolve* in this use case means to match identifiers, create new craft, merge or delete craft or transfer identifiers between craft and merge actions might only be allowed if effective speed checks are passed.
 
