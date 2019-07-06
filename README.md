@@ -113,6 +113,104 @@ The result is a set M2 that replaces M in S.
 ## Testing
 The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem2/SystemTest.java).
 
+## Test cases
+We use the following notation to represent an EntityState:
+
+    N KV KV KV ...
+
+For example:
+
+    1 A1 B2 C3
+
+The first item is the metadata and for our test cases will be a timestamp (integer). The following items are the identifiers of the EntityState: A=1, B=2, C=3. 
+
+Now we are going to run through some test cases and you will probably get the hang of why this is a reasonably tricky thing to get right
+
+### Metadata update only
+
+System:
+1 A1
+
+New:
+2 A1
+
+System after:
+2 A1
+
+Rationale:
+This corresponds to an update of the metadata only for a vessel.
+
+### Metadata update only, stale
+
+System:
+2 A1
+
+New:
+1 A1
+
+System after:
+2 A1
+
+Rationale:
+The metadata does not change because the new EntityState is superseded by existing.
+
+### New entity
+
+System:
+1 A1
+
+New:
+2 A2
+
+System after:
+1 A1
+2 A2
+
+Rationale:
+There are no matches in the System for the new record so a new entity is created.
+
+### Identifier conflict, conflict keys weaker than common keys, new supersedes
+
+System:
+1 A1 B1
+
+New:
+2 A1 B2
+
+System after:
+2 A1 B2
+
+Rationale:
+
+### Identifier conflict, conflict keys stronger than common keys, new supersedes
+
+System:
+1 A1 B1
+
+New:
+2 A2 B1
+
+System after:
+1 A1
+2 A2 B1
+
+Rationale:
+
+### Merge many
+
+System:
+1 A1 B1
+2 C1 D1
+3 E1 F1
+
+New:
+4 A1 D1 F1
+
+System after:
+4 A1 B1 C1 D1 E1 F1
+
+Rationale:
+
 ## Using this algorithm
 The algorithm has been abstracted substantially. You will need to make an implementation of [`System`](src/main/java/com/github/davidmoten/viem/System.java). The `System` class has a default method that implements the algorithm above and mutates or returns a new `System` on arrival of a new `EntityState`. The use of immutability, data structures and lookup is largely up to you (`System.merge` method may return the same System or a new one). 
 
