@@ -88,7 +88,7 @@ add p to M2
 The result is a set M2 that replaces M in S.
 
 ## Testing
-The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem2/SystemTest.java).
+The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem/SystemTest.java).
 
 ## Using this algorithm
 The algorithm has been abstracted substantially. You will need to make an implementation of [`System`](src/main/java/com/github/davidmoten/viem/System.java). The `System` class has a default method that implements the algorithm above and mutates or returns a new `System` on arrival of a new `EntityState`. The use of immutability, data structures and lookup is largely up to you (`System.merge` method may return the same System or a new one). 
