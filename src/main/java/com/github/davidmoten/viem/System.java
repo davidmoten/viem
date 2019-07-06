@@ -26,10 +26,6 @@ public interface System<K, V, M> {
         return EntityState.create(identifiers, metadata);
     }
 
-    default KeyValue<K, V> createKeyValue(K key, V value) {
-        return KeyValue.create(key, value);
-    }
-
     default System<K, V, M> merge(EntityState<K, V, M> entity) {
         MergeResult<K, V, M> r = Util.merge(this, entity);
         return update(r.matches, r.newEntityStates);

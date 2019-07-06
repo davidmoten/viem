@@ -4,17 +4,20 @@ import java.util.Map;
 
 final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
 
-    private final Map<K, V> map;
+    private final Map<K, V> identifiers;
     private final M metadata;
 
-    EntityStateDefault(Map<K, V> map, M metadata) {
-        this.map = map;
+    EntityStateDefault(Map<K, V> identifiers, M metadata) {
+        if (identifiers == null) {
+            throw new NullPointerException("identifiers cannot be null");
+        }
+        this.identifiers = identifiers;
         this.metadata = metadata;
     }
 
     @Override
     public Map<K, V> identifiers() {
-        return map;
+        return identifiers;
     }
 
     @Override
@@ -26,7 +29,7 @@ final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((map == null) ? 0 : map.hashCode());
+        result = prime * result + identifiers.hashCode();
         result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
         return result;
     }
@@ -40,10 +43,7 @@ final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
         if (getClass() != obj.getClass())
             return false;
         EntityStateDefault<?, ?, ?> other = (EntityStateDefault<?, ?, ?>) obj;
-        if (map == null) {
-            if (other.map != null)
-                return false;
-        } else if (!map.equals(other.map))
+        if (!identifiers.equals(other.identifiers))
             return false;
         if (metadata == null) {
             if (other.metadata != null)
@@ -55,6 +55,6 @@ final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
 
     @Override
     public String toString() {
-        return "EntityStateDefault [ids=" + map + ", metadata=" + metadata + "]";
+        return "EntityStateDefault [ids=" + identifiers + ", metadata=" + metadata + "]";
     }
 }
