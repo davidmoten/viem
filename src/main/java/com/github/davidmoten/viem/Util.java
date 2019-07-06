@@ -2,6 +2,7 @@ package com.github.davidmoten.viem;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,10 @@ final class Util {
         } else {
             return b;
         }
+    }
+
+    static <K, V, M> Comparator<K> comparator(System<K, V, M> system) {
+        return (x, y) -> compare(system, x, y);
     }
 
     static <K, V, M> int compare(System<K, V, M> system, K a, K b) {
@@ -88,8 +93,8 @@ final class Util {
         if (a.isEmpty()) {
             return false;
         }
-        K maxKeyA = Collections.max(a, (x, y) -> Util.compare(system, x, y));
-        K maxKeyB = Collections.max(b, (x, y) -> Util.compare(system, x, y));
+        K maxKeyA = Collections.max(a, comparator(system));
+        K maxKeyB = Collections.max(b, comparator(system));
         return system.keyGreaterThan(maxKeyA, maxKeyB);
     }
 
@@ -98,10 +103,8 @@ final class Util {
         List<EntityState<K, V, M>> matches = new ArrayList<>(system.matches(e.identifiers()));
         Collections.sort(matches, //
                 (a, b) -> {
-                    K x = Collections.max(a.identifiers().keySet(), //
-                            (r, s) -> Util.compare(system, r, s));
-                    K y = Collections.max(b.identifiers().keySet(), //
-                            (r, s) -> Util.compare(system, r, s));
+                    K x = Collections.max(a.identifiers().keySet(), comparator(system));
+                    K y = Collections.max(b.identifiers().keySet(), comparator(system));
                     return Util.compare(system, x, y);
                 });
         EntityState<K, V, M> p = e;
