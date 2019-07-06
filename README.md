@@ -86,12 +86,11 @@ find M which is the set of all entity-states in S that have one or more common i
 
 let I = the set of all identifiers in entity-states in M
 
-sort the members of `M` into a list `L` of descending order of identifier confidence based on the highest confidence identifier in the common identifiers with e.
+sort the members of M into a list L of descending order of identifier confidence based on the highest confidence identifier in the common identifiers with e.
 
 Set the provisional entity-state p = e
 let M2 = empty set of entity-states
-while p has identifiers and L has members
-  let f be the first available member of L and remove it from L
+for each f in L
   let I1 = set of common key-values in p, f
   let I2 = set of conflicting key-values in p, f
   let I3 = set of key-values where the keys are present in only one of p, f
@@ -107,9 +106,7 @@ while p has identifiers and L has members
     if min not empty
       add min to M2
   p = max
-loop
-if p not empty 
-  add p to M2
+add p to M2
 ```
 The result is a set M2 that replaces M in S.
 
