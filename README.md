@@ -103,7 +103,22 @@ The first item is the metadata and for our test cases will be a timestamp (integ
 
 Now we are going to run through some test cases and you will probably get the hang of why this is a reasonably tricky thing to get right
 
-### Metadata update only
+### New entity
+
+System:<br/>
+1 A1
+
+New:<br/>
+2 A2
+
+System after:<br/>
+1 A1<br/>
+2 A2
+
+Rationale:<br/>
+There are no matches in the System for the new record so a new EntityState is created.
+
+### Metadata update only, mergeable
 
 System:<br/>
 1 A1
@@ -115,7 +130,7 @@ System after:<br/>
 2 A1
 
 Rationale:
-This corresponds to an update of the metadata only for a vessel.
+This corresponds to an update of the metadata only for the EntityState.
 
 ### Metadata update only, stale
 
@@ -131,22 +146,7 @@ System after:<br/>
 Rationale:
 The metadata does not change because the new EntityState is superseded by existing.
 
-### New entity
-
-System:<br/>
-1 A1
-
-New:<br/>
-2 A2
-
-System after:<br/>
-1 A1
-2 A2
-
-Rationale:<br/>
-There are no matches in the System for the new record so a new entity is created.
-
-### Identifier conflict, conflict keys weaker than common keys, new supersedes
+### Identifier conflict, conflicting keys weaker than common keys, new supersedes
 
 System:<br/>
 1 A1 B1
@@ -159,7 +159,7 @@ System after:<br/>
 
 Rationale:<br/>
 
-### Identifier conflict, conflict keys stronger than common keys, new supersedes
+### Identifier conflict, conflicting keys stronger than common keys, new supersedes
 
 System:<br/>
 1 A1 B1
@@ -168,7 +168,7 @@ New:<br/>
 2 A2 B1
 
 System after:<br/>
-1 A1
+1 A1<br/>
 2 A2 B1
 
 Rationale:<br/>
@@ -176,17 +176,17 @@ Rationale:<br/>
 ### Merge many
 
 System:<br/>
-1 A1 B1
-2 C1 D1
+1 A1 B1<br/>
+2 C1 D1<br/>
 3 E1 F1
 
 New:<br/>
-4 A1 D1 F1
+1 A1 D1 F1
 
 System after:<br/>
-4 A1 B1 C1 D1 E1 F1
+3 A1 B1 C1 D1 E1 F1
 
-Rationale:<br/>
+Rationale:<br/> The new EntityState is a bit older than existing metadata (timestamp) but establishes a relationship between the three entities that we then merge.
 
 ## Using this algorithm
 The algorithm has been abstracted substantially. You will need to make an implementation of [`System`](src/main/java/com/github/davidmoten/viem/System.java). The `System` class has a default method that implements the algorithm above and mutates or returns a new `System` on arrival of a new `EntityState`. The use of immutability, data structures and lookup is largely up to you (`System.merge` method may return the same System or a new one). 
