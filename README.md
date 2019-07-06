@@ -53,30 +53,7 @@ Each entity-state `e` has a set of identifier tuples `keyValues(e) = {[key`<sub>
 
 No key-value identifier appears more than once across a whole system (but the arriving entity-state may have identifiers in common with entity-states in the current system).
 
-Define these functions:
-
-* `keys: EntityState -> Set[Key]`
-
-* `keyValues: EntityState -> Set[KeyValue]`
-
-We also define
-
-* `keyValues: Set[EntityState]-> Set[KeyValue] = union of keyValues(e) for entity-state e in set S`
-
 For an arriving entity-state `e` we define the function `matches(e, S)` to be the set of entity-states in `S` that have one or more key-value pairs in common with `e`.
-
-For each pair of entity-states `e`<sub>1</sub> and `e`<sub>2</sub> we define these functions 
-
-* `common(e`<sub>1</sub>`, e`<sub>2</sub>`): EntityState x EntityState-> Set[KeyValue]` giving the set of key-value pairs that are present in both `e`<sub>1</sub> and `e`<sub>2</sub> 
-
-* `conflicting(e`<sub>1</sub>`, e`<sub>2</sub>`): EntityState x EntityState -> Set[KeyValue]` giving the set of key-value pairs that are present by key in both `e`<sub>1</sub> and `e`<sub>2</sub> but have different values
-
-* `different(e`<sub>1</sub>`, e`<sub>2</sub>`): EntityState x EntityState -> Set[KeyValue]` giving the set of key-value pairs whose keys are present in only one of `e`<sub>1</sub> and `e`<sub>2</sub> 
-
-We also define comparators based on the mentioned strict orderings. The comparators are represented by `>`, `<` operators and this is their usage:
-
-* `a > b` for entity-states
-* `x > y` for identifier keys
 
 ## Algorithm
 Given a *system* `S` and an *entity-state* `e` to resolve against `S` (mutation) the algorithm is as follows:
@@ -111,7 +88,7 @@ add p to M2
 The result is a set M2 that replaces M in S.
 
 ## Testing
-The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem2/SystemTest.java).
+The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem/SystemTest.java).
 
 ## Test cases
 We use the following notation to represent an EntityState:
