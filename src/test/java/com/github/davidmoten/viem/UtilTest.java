@@ -1,5 +1,6 @@
 package com.github.davidmoten.viem;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Collections;
@@ -7,7 +8,6 @@ import java.util.Collections;
 import org.junit.Test;
 
 import com.github.davidmoten.junit.Asserts;
-import com.github.davidmoten.viem.Util;
 
 public class UtilTest {
 
@@ -20,6 +20,13 @@ public class UtilTest {
     public void testGreaterThanEmpty() {
         assertFalse(Util.greaterThan(new SystemImpl(Collections.emptySet()),
                 Collections.<String>emptySet(), Collections.singleton("boo")));
+    }
+
+    @Test
+    public void testGreaterThan() {
+        SystemImpl system = SystemImpl.create();
+        assertEquals(1, Util.compare(system, "A", "B"));
+        assertEquals(-1, Util.compare(system, "B", "A"));
     }
 
 }
