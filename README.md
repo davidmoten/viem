@@ -12,7 +12,7 @@ My workplace has multiple sources of craft (vessel, aircraft, vehicle, tracking 
 
 We want to resolve this information into a latest positions layer. Ideally we only want to see one dot on a map for the latest position of one physical craft.
 
-Craft positions come in with a type (vessel, aircraft, vehicle, tracking device, and others), and one or more identifiers. Identifiers are key-value pairs like ["MMSI","123456789"] (MMSI is a vessel identifier).
+Craft positions come in with a type (vessel, aircraft, vehicle, tracking device, and others), and one or more identifiers. Identifiers are key-value pairs like MMSI=123456789 (MMSI is a vessel identifier).
 
 For a ship, the physical craft is the hull, for an aircraft the airframe, for a vehicle the chassis. 
 
