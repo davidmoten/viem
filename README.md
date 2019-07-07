@@ -188,6 +188,24 @@ System after:<br/>
 
 Rationale:<br/> The new EntityState is a bit older than existing metadata (timestamp) but establishes a relationship between the three entities that we then merge.
 
+### Merge many, one merge rejected
+
+System:<br/>
+1 A1 B1<br/>
+2 C1 D1<br/>
+3 E1 F1
+
+New:<br/>
+1 A1 D1 F1
+
+Merge with E1 F1 rejected (e.g. effective speed too high)
+
+System after:<br/>
+1 E1 F1
+3 A1 B1 C1 D1
+
+Rationale:<br/> The new EntityState is a bit older than existing metadata (timestamp) but establishes a relationship between the three entities. The mergeable function returns false when checking against E1 F1. The timestamp on E1 F1 is later than the new EntityState so we drop F1 from the new EntityState and E1 F1 lives on as a separate entity state.
+
 ## Using this algorithm
 The algorithm has been abstracted substantially. You will need to make an implementation of [`System`](src/main/java/com/github/davidmoten/viem/System.java). The `System` class has a default method that implements the algorithm above and mutates or returns a new `System` on arrival of a new `EntityState`. The use of immutability, data structures and lookup is largely up to you (`System.merge` method may return the same System or a new one). 
 
