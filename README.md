@@ -87,7 +87,7 @@ add p to M2
 ```
 The result is a set M2 that replaces M in S.
 
-The implementation of the above algorithm is visible in [src/main/java/com/github/davidmoten/viem/Util.java].
+The implementation of the above algorithm is visible in [Util.java](src/main/java/com/github/davidmoten/viem/Util.java).
 
 ## Testing
 The above algorithm has been implemented in Java (for reuse) and has been tested over a number of scenarios visible in [SystemTest.java](src/test/java/com/github/davidmoten/viem/SystemTest.java).
