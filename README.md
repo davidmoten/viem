@@ -67,7 +67,7 @@ sort the members of M into a list L of descending order of identifier confidence
 
 Set the provisional entity-state p = e
 let M2 = empty set of entity-states
-for each f in L
+for each entity-state f in L
   let I1 = set of common key-values in p, f
   let I2 = set of conflicting key-values in p, f
   let I3 = set of key-values where the keys are present in only one of p, f
