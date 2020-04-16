@@ -51,7 +51,7 @@ Define the current state of a system to be a set of entity-states `S = {e`<sub>1
 
 Each entity-state `e` has a set of identifier tuples `keyValues(e) = {[key`<sub>1</sub>`, value`<sub>1</sub>`], [key`<sub>2</sub>`, value`<sub>2</sub>`], ..}` which are unique by key for that object.
 
-No key-value identifier appears more than once across a whole system (but the arriving entity-state may have identifiers in common with entity-states in the current system).
+No key-value identifier appears more than once across a whole system (but the arriving entity-state may have identifiers in common with multiple entity-states in the current system).
 
 For an arriving entity-state `e` we define the function `matches(e, S)` to be the set of entity-states in `S` that have one or more key-value pairs in common with `e`.
 
