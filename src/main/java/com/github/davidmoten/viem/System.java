@@ -57,7 +57,7 @@ public interface System<K, V, M> {
     }
 
     default System<K, V, M> merge(EntityState<K, V, M> entity) {
-        MergeResult<K, V, M> r = Util.merge(this, entity);
+        MergeResult<K, V, M> r = Algorithm.merge(this, entity);
         return update(r.matches, r.newEntityStates);
     }
 

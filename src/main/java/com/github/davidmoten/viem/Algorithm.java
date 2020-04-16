@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-final class Util {
+final class Algorithm {
 
-    private Util() {
+    private Algorithm() {
         // prevent instantiation
     }
 
@@ -105,19 +105,18 @@ final class Util {
                 (a, b) -> {
                     K x = Collections.max(a.identifiers().keySet(), comparator(system));
                     K y = Collections.max(b.identifiers().keySet(), comparator(system));
-                    return Util.compare(system, x, y);
+                    return compare(system, x, y);
                 });
         EntityState<K, V, M> p = e;
         for (EntityState<K, V, M> f : matches) {
-            Map<K, V> i1 = Util.common(p, f);
-            Map<K, Pair<V>> i2 = Util.conflicting(p, f);
-            Map<K, V> i3 = Util.exclusive(p, f);
-            EntityState<K, V, M> min = Util.min(system, p, f);
-            EntityState<K, V, M> max = Util.max(system, p, f);
-            if (Util.greaterThan(system, i1.keySet(), i2.keySet())
+            Map<K, V> i1 = common(p, f);
+            Map<K, Pair<V>> i2 = conflicting(p, f);
+            Map<K, V> i3 = exclusive(p, f);
+            EntityState<K, V, M> min = min(system, p, f);
+            EntityState<K, V, M> max = max(system, p, f);
+            if (greaterThan(system, i1.keySet(), i2.keySet())
                     && system.mergeable(p.metadata(), f.metadata())) {
-                Map<K, V> ids = new HashMap<>();
-                ids.putAll(max.identifiers());
+                Map<K, V> ids = new HashMap<>(max.identifiers());
                 ids.putAll(i3);
                 M metadata = system.merge(p.metadata(), f.metadata());
                 EntityState<K, V, M> next = system.createEntityState(ids, metadata);
