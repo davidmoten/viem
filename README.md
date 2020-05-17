@@ -7,6 +7,8 @@ An algorithm and a java library for handling entity matching when entities can h
 
 Status: *pre-alpha*
 
+See [entity-tracking-in-memory](https://github.com/davidmoten/entity-tracking-in-memory) for an implementation of *viem*.
+
 ## Problem statement
 My workplace has multiple sources of craft (vessel, aircraft, vehicle, tracking device, beacons) information coming in as timestamped geographic positions with metadata.
 
