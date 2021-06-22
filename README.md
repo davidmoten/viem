@@ -207,7 +207,7 @@ New:<br/>
 Merge with E1 F1 rejected (e.g. effective speed too high)
 
 System after:<br/>
-1 E1 F1
+1 E1 F1<br/>
 3 A1 B1 C1 D1
 
 Rationale:<br/> The new EntityState is a bit older than existing metadata (timestamp) but establishes a relationship between the three entities. The mergeable function returns false when checking against E1 F1. The timestamp on E1 F1 is later than the new EntityState so we drop F1 from the new EntityState and E1 F1 lives on as a separate entity state.
