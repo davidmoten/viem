@@ -17,14 +17,14 @@ public class EntityStateDefaultTest {
         assertFalse(e.equals(null));
         assertFalse(e.equals(123));
         assertTrue(create(null).equals(create(null)));
-        assertFalse(create(null).equals(create(1)));
-        assertFalse(create(1).equals(create(2)));
+        assertTrue(create(null).equals(create(1)));
+        assertTrue(create(1).equals(create(2)));
     }
 
     @Test
     public void testHashCode() {
-        assertEquals(962, create(1).hashCode());
-        assertEquals(961, create(null).hashCode());
+        assertEquals(0, create(1).hashCode());
+        assertEquals(0, create(null).hashCode());
     }
 
     @Test(expected = NullPointerException.class)

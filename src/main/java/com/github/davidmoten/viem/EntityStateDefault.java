@@ -27,30 +27,12 @@ final class EntityStateDefault<K, V, M> implements EntityState<K, V, M> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + identifiers.hashCode();
-        result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
-        return result;
+        return EntityState.hashCode(this);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        EntityStateDefault<?, ?, ?> other = (EntityStateDefault<?, ?, ?>) obj;
-        if (!identifiers.equals(other.identifiers))
-            return false;
-        if (metadata == null) {
-            if (other.metadata != null)
-                return false;
-        } else if (!metadata.equals(other.metadata))
-            return false;
-        return true;
+        return EntityState.equals(this, obj);
     }
 
     @Override

@@ -6,9 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.github.davidmoten.viem.EntityState;
-import com.github.davidmoten.viem.System;
-
 final class SystemImpl implements System<String, String, Long> {
 
     // mutable
