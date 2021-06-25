@@ -23,7 +23,9 @@ public interface System<K, V, M> {
 
     /**
      * Returns all EntityStates that match one or more of the identifiers (both in
-     * key and value).
+     * key and value). Note that equals and hashCode must be implemented in
+     * EntityState based solely on the identifiers. This fact is also mentioned in
+     * the EntityState javadoc.
      * 
      * @param identifiers identifiers to match on
      * @return all EntityStates that match one or more of the identifiers (both in
@@ -43,8 +45,30 @@ public interface System<K, V, M> {
      */
     boolean keyGreaterThan(K a, K b);
 
+    /**
+     * Returns true if and only if a is more reliable than b. That is a > b means
+     * that we would choose the a version of any properties over the b version. When
+     * time is included in the metadata and we seek that the System holds the latest
+     * information then we would consider the metadata with the later timestamp more
+     * reliable than the metadata with the earlier timestamp.
+     * 
+     * @param a metadata
+     * @param b metadata
+     * @return true if and only if a is more "reliable" than b
+     */
     boolean metadataGreaterThan(M a, M b);
 
+    /**
+     * Returns true if and only if there is no inherent important conflict between
+     * the reports that would prevent the merging of metadata. For example, in the
+     * case where metadata contains positional and time information and the reports
+     * are for timestamped vessel positions then we might reject two sets of
+     * metadata if the calculated effective speed was beyond a probable maximum.
+     * 
+     * @param a metadata
+     * @param b metadata
+     * @return true if and only if the reports with given metadata can be merged
+     */
     boolean mergeable(M a, M b);
 
     M merge(M a, M b);
