@@ -48,7 +48,7 @@ final class SystemImpl implements System<String, String, Long> {
     }
 
     @Override
-    public boolean mergeable(Long a, Long b) {
+    public boolean mergeable(Map<String, String> idsA, Long a, Map<String, String> idsB, Long b) {
         return mergeable;
     }
 

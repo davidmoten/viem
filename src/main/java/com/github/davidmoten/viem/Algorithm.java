@@ -114,8 +114,8 @@ final class Algorithm {
             Map<K, V> i3 = exclusive(p, f);
             EntityState<K, V, M> min = min(system, p, f);
             EntityState<K, V, M> max = max(system, p, f);
-            if (greaterThan(system, i1.keySet(), i2.keySet())
-                    && system.mergeable(p.metadata(), f.metadata())) {
+            if (greaterThan(system, i1.keySet(), i2.keySet()) && system.mergeable(p.identifiers(),
+                    p.metadata(), f.identifiers(), f.metadata())) {
                 Map<K, V> ids = new HashMap<>(max.identifiers());
                 ids.putAll(i3);
                 M metadata = system.merge(p.metadata(), f.metadata());

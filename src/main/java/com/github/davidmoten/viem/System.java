@@ -65,11 +65,13 @@ public interface System<K, V, M> {
      * are for timestamped vessel positions then we might reject two sets of
      * metadata if the calculated effective speed was beyond a probable maximum.
      * 
-     * @param a metadata
-     * @param b metadata
+     * @param idsA      ids of a
+     * @param metadataA metadata of a
+     * @param idsB      ids of b
+     * @param metadataB
      * @return true if and only if the reports with given metadata can be merged
      */
-    boolean mergeable(M a, M b);
+    boolean mergeable(Map<K, V> idsA, M a, Map<K, V> idsB, M b);
 
     M merge(M a, M b);
 
