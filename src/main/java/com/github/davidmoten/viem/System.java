@@ -68,7 +68,9 @@ public interface System<K, V, M> {
      * <p>
      * Note that normally only the metadata is required for mergeability (for
      * example via an effective speed check) and that identifiers are included (via
-     * EntityState) for logging purposes and as a lesser purpose for some unusual mergeability criteria (like don't ever merge vessel 13579135 with a vessel outside of Sydney Harbour because it shouldnt' be anywhere else).
+     * EntityState) for logging purposes and as a lesser purpose for some unusual
+     * mergeability criteria (like don't ever merge vessel 13579135 with a vessel
+     * outside of Sydney Harbour because it shouldnt' be anywhere else).
      * 
      * @param a first entity state
      * @param b second entity state
