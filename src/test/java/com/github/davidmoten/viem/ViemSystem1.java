@@ -4,26 +4,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-final class SystemImpl implements ViemSystem<String, String, Long> {
+/**
+ * A ViemSystem for testing purposes only. Doesn't scale well because O(N)
+ * lookups are used. A proper implementation would use O(1) lookups.
+ *
+ */
+class ViemSystem1 implements ViemSystem<String, String, Long> {
 
     // mutable
-    boolean mergeable = true;
+    BiPredicate<EntityState<String, String, Long>, EntityState<String, String, Long>> mergeable = (
+            a, b) -> true;
 
-    private final Set<EntityState<String, String, Long>> set;
+    final Set<EntityState<String, String, Long>> set;
 
-    public SystemImpl(Set<EntityState<String, String, Long>> set) {
+    public ViemSystem1(Set<EntityState<String, String, Long>> set) {
         this.set = set;
     }
 
     @SafeVarargs
-    static SystemImpl create(EntityState<String, String, Long>... states) {
+    static ViemSystem1 create(EntityState<String, String, Long>... states) {
         Set<EntityState<String, String, Long>> set = new HashSet<>();
         for (EntityState<String, String, Long> state : states) {
             set.add(state);
         }
-        return new SystemImpl(set);
+        return new ViemSystem1(set);
     }
 
     @Override
@@ -48,8 +56,9 @@ final class SystemImpl implements ViemSystem<String, String, Long> {
     }
 
     @Override
-    public boolean mergeable(EntityState<String, String, Long> a, EntityState<String, String, Long> b) {
-        return mergeable;
+    public boolean mergeable(EntityState<String, String, Long> a,
+            EntityState<String, String, Long> b) {
+        return mergeable.test(a, b);
     }
 
     @Override

@@ -18,13 +18,13 @@ public class UtilTest {
 
     @Test
     public void testGreaterThanEmpty() {
-        assertFalse(Algorithm.greaterThan(new SystemImpl(Collections.emptySet()),
+        assertFalse(Algorithm.greaterThan(new ViemSystem1(Collections.emptySet()),
                 Collections.<String>emptySet(), Collections.singleton("boo")));
     }
 
     @Test
     public void testGreaterThan() {
-        SystemImpl system = SystemImpl.create();
+        ViemSystem1 system = ViemSystem1.create();
         assertEquals(1, Algorithm.compare(system, "A", "B"));
         assertEquals(-1, Algorithm.compare(system, "B", "A"));
     }

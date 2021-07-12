@@ -32,8 +32,8 @@ public class SystemTest {
 
     @Test
     public void testSimpleNewAfterNoMerge() {
-        SystemImpl sys = system(es(1, "A1"));
-        sys.mergeable = false;
+        ViemSystem1 sys = system(es(1, "A1"));
+        sys.mergeable = (a, b) -> false;
         assertEquals(set(es(2, "A1")), sys.merge(es(2, "A1")).toSet());
     }
 
@@ -110,12 +110,12 @@ public class SystemTest {
     }
 
     @SafeVarargs
-    private static SystemImpl system(EntityState<String, String, Long>... entityStates) {
-        ViemSystem<String, String, Long> s = SystemImpl.create();
+    private static ViemSystem1 system(EntityState<String, String, Long>... entityStates) {
+        ViemSystem<String, String, Long> s = ViemSystem1.create();
         for (EntityState<String, String, Long> e : entityStates) {
             s = s.merge(e);
         }
-        return (SystemImpl) s;
+        return (ViemSystem1) s;
     }
 
     @SafeVarargs
