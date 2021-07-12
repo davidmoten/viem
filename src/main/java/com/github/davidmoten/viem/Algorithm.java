@@ -98,7 +98,8 @@ final class Algorithm {
         return system.keyGreaterThan(maxKeyA, maxKeyB);
     }
 
-    static <K, V, M> MergeResult<K, V, M> merge(ViemSystem<K, V, M> system, EntityState<K, V, M> e) {
+    static <K, V, M> MergeResult<K, V, M> merge(ViemSystem<K, V, M> system,
+            EntityState<K, V, M> e) {
         Set<EntityState<K, V, M>> set = new HashSet<>();
         List<EntityState<K, V, M>> matches = new ArrayList<>(system.matches(e.identifiers()));
         Collections.sort(matches, //
@@ -109,12 +110,14 @@ final class Algorithm {
                 });
         EntityState<K, V, M> p = e;
         for (EntityState<K, V, M> f : matches) {
+            system.comparing(p, f);
             Map<K, V> i1 = common(p, f);
             Map<K, Pair<V>> i2 = conflicting(p, f);
             Map<K, V> i3 = exclusive(p, f);
             EntityState<K, V, M> min = min(system, p, f);
             EntityState<K, V, M> max = max(system, p, f);
-            if (greaterThan(system, i1.keySet(), i2.keySet()) && system.mergeable(p, f)) {
+            if (greaterThan(system, i1.keySet(), i2.keySet())
+                    && system.mergeable(p.metadata(), f.metadata())) {
                 Map<K, V> ids = new HashMap<>(max.identifiers());
                 ids.putAll(i3);
                 M metadata = system.merge(p.metadata(), f.metadata());

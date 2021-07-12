@@ -15,11 +15,20 @@ import java.util.stream.Collectors;
  */
 class ViemSystem1 implements ViemSystem<String, String, Long> {
 
-    // mutable
-    BiPredicate<EntityState<String, String, Long>, EntityState<String, String, Long>> mergeable = (
-            a, b) -> true;
+    private EntityState<String, String, Long> es1;
+    private EntityState<String, String, Long> es2;
 
-    final Set<EntityState<String, String, Long>> set;
+    @Override
+    public void comparing(EntityState<String, String, Long> a,
+            EntityState<String, String, Long> b) {
+       es1 = a;
+       es2 = b;
+    }
+
+    // mutable
+    BiPredicate<Long, Long> mergeable = (a, b) -> true;
+
+    private final Set<EntityState<String, String, Long>> set;
 
     public ViemSystem1(Set<EntityState<String, String, Long>> set) {
         this.set = set;
@@ -56,8 +65,7 @@ class ViemSystem1 implements ViemSystem<String, String, Long> {
     }
 
     @Override
-    public boolean mergeable(EntityState<String, String, Long> a,
-            EntityState<String, String, Long> b) {
+    public boolean mergeable(Long a, Long b) {
         return mergeable.test(a, b);
     }
 

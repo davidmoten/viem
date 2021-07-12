@@ -60,9 +60,10 @@ public interface ViemSystem<K, V, M> {
 
     /**
      * Returns true if and only if there is no inherent important conflict between
-     * the reports that would prevent the merging of metadata. For example, in the
-     * case where metadata contains positional and time information and the reports
-     * are for timestamped vessel positions then we might reject two sets of
+     * the reports that would prevent the merging of metadata (ignore identifers
+     * because the mergeability of identifiers is handled elsewhere). For example,
+     * in the case where metadata contains positional and time information and the
+     * reports are for timestamped vessel positions then we might reject two sets of
      * metadata if the calculated effective speed was beyond a probable maximum.
      * 
      * <p>
@@ -76,7 +77,7 @@ public interface ViemSystem<K, V, M> {
      * @param b second entity state
      * @return true if and only if the reports with given metadata can be merged
      */
-    boolean mergeable(EntityState<K, V, M> a, EntityState<K, V, M> b);
+    boolean mergeable(M a, M b);
 
     M merge(M a, M b);
 
@@ -98,6 +99,11 @@ public interface ViemSystem<K, V, M> {
             set.add(es);
         }
         return set;
+    }
+
+    default void comparing(EntityState<K, V, M> a, EntityState<K, V, M> b) {
+        // useful for logging purposes
+        // default action is to do nothing
     }
 
 }
