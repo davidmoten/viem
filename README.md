@@ -5,7 +5,7 @@
 
 An algorithm and a java library for handling entity matching when entities can have multiple identifiers each of which is potentially volatile (having a non-permanent lifecycle).
 
-Status: *pre-alpha*
+Status: *alpha*
 
 See [entity-tracking-in-memory](https://github.com/davidmoten/entity-tracking-in-memory) for an implementation of *viem*.
 
