@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
  */
 class ViemSystem1 implements ViemSystem<String, String, Long> {
 
-    private EntityState<String, String, Long> es1;
-    private EntityState<String, String, Long> es2;
+    EntityState<String, String, Long> es1;
+    EntityState<String, String, Long> es2;
 
     @Override
     public void comparing(EntityState<String, String, Long> a,
             EntityState<String, String, Long> b) {
-       es1 = a;
-       es2 = b;
+        es1 = a;
+        es2 = b;
     }
 
     // mutable

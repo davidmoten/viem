@@ -89,15 +89,25 @@ public class SystemTest {
                 system(es(3, "A1", "E1"), es(0, "A1", "D1"), es(1, "B1", "E1"), es(2, "C1", "F1"))
                         .merge(es(2, "A1", "B1", "C1")).toSet());
     }
-    
-    //TODO for this test case we need to get the system to reject 
-//    @Test
-//    public void testMergeWithRejection() {
-//        assertEquals(set( //
-//                es(2, "A1", "B1", "C1", "D1"), es(3, "E1", "F1")),
-//                system(es(1, "A1", "B1"), es(2, "C1", "D1"), es(3, "E1", "F1"))
-//                        .merge(es(1, "A1", "D1", "F1")).toSet());
-//    }
+
+    // TODO for this test case we need to get the system to reject
+    @Test
+    public void testMergeWithRejection() {
+        EntityState<String, String, Long> es = es(1, "A1", "D1", "F1");
+        EntityState<String, String, Long> es1 = es(1, "A1", "B1");
+        EntityState<String, String, Long> es2 = es(2, "C1", "D1");
+        EntityState<String, String, Long> es3 = es(3, "E1", "F1");
+        ViemSystem1 sys = system(es1, es2, es3);
+        Set<EntityState<String, String, Long>> pair = new HashSet<>();
+        pair.add(es1);
+        pair.add(es2);
+        sys.mergeable = (a, b) -> {
+            System.out.println(sys.es1 + " and " + sys.es2);
+            return sys.es1 != es || sys.es2 != es3;
+        };
+        assertEquals(set( //
+                es(2, "A1", "B1", "C1", "D1"), es3), sys.merge(es).toSet());
+    }
 
     private static EntityState<String, String, Long> es(long timestamp, String... strings) {
         Map<String, String> map = Arrays.stream(strings)
