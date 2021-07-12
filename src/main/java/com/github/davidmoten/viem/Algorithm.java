@@ -17,7 +17,7 @@ final class Algorithm {
         // prevent instantiation
     }
 
-    static <K, V, M> EntityState<K, V, M> min(System<K, V, M> system, EntityState<K, V, M> a,
+    static <K, V, M> EntityState<K, V, M> min(ViemSystem<K, V, M> system, EntityState<K, V, M> a,
             EntityState<K, V, M> b) {
         if (system.metadataGreaterThan(a.metadata(), b.metadata())) {
             return b;
@@ -26,7 +26,7 @@ final class Algorithm {
         }
     }
 
-    static <K, V, M> EntityState<K, V, M> max(System<K, V, M> system, EntityState<K, V, M> a,
+    static <K, V, M> EntityState<K, V, M> max(ViemSystem<K, V, M> system, EntityState<K, V, M> a,
             EntityState<K, V, M> b) {
         if (system.metadataGreaterThan(a.metadata(), b.metadata())) {
             return a;
@@ -35,11 +35,11 @@ final class Algorithm {
         }
     }
 
-    static <K, V, M> Comparator<K> comparator(System<K, V, M> system) {
+    static <K, V, M> Comparator<K> comparator(ViemSystem<K, V, M> system) {
         return (x, y) -> compare(system, x, y);
     }
 
-    static <K, V, M> int compare(System<K, V, M> system, K a, K b) {
+    static <K, V, M> int compare(ViemSystem<K, V, M> system, K a, K b) {
         return system.keyGreaterThan(a, b) ? 1 : -1;
     }
 
@@ -86,7 +86,7 @@ final class Algorithm {
         return map;
     }
 
-    static <K, V, M> boolean greaterThan(System<K, V, M> system, Set<K> a, Set<K> b) {
+    static <K, V, M> boolean greaterThan(ViemSystem<K, V, M> system, Set<K> a, Set<K> b) {
         if (b.isEmpty()) {
             return true;
         }
@@ -98,7 +98,7 @@ final class Algorithm {
         return system.keyGreaterThan(maxKeyA, maxKeyB);
     }
 
-    static <K, V, M> MergeResult<K, V, M> merge(System<K, V, M> system, EntityState<K, V, M> e) {
+    static <K, V, M> MergeResult<K, V, M> merge(ViemSystem<K, V, M> system, EntityState<K, V, M> e) {
         Set<EntityState<K, V, M>> set = new HashSet<>();
         List<EntityState<K, V, M>> matches = new ArrayList<>(system.matches(e.identifiers()));
         Collections.sort(matches, //

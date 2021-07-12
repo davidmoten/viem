@@ -111,7 +111,7 @@ public class SystemTest {
 
     @SafeVarargs
     private static SystemImpl system(EntityState<String, String, Long>... entityStates) {
-        System<String, String, Long> s = SystemImpl.create();
+        ViemSystem<String, String, Long> s = SystemImpl.create();
         for (EntityState<String, String, Long> e : entityStates) {
             s = s.merge(e);
         }

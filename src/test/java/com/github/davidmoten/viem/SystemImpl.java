@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-final class SystemImpl implements System<String, String, Long> {
+final class SystemImpl implements ViemSystem<String, String, Long> {
 
     // mutable
     boolean mergeable = true;
@@ -63,7 +63,7 @@ final class SystemImpl implements System<String, String, Long> {
     }
 
     @Override
-    public System<String, String, Long> update(List<EntityState<String, String, Long>> matches,
+    public ViemSystem<String, String, Long> update(List<EntityState<String, String, Long>> matches,
             Set<EntityState<String, String, Long>> newEntityStates) {
         set.removeAll(matches);
         set.addAll(newEntityStates);

@@ -12,7 +12,7 @@ import java.util.Set;
  * @param <V> identifier value type
  * @param <M> metadata type
  */
-public interface System<K, V, M> {
+public interface ViemSystem<K, V, M> {
 
     /**
      * Returns an Iterable of the current entity-states in the system.
@@ -70,7 +70,7 @@ public interface System<K, V, M> {
      * example via an effective speed check) and that identifiers are included (via
      * EntityState) for logging purposes and as a lesser purpose for some unusual
      * mergeability criteria (like don't ever merge vessel 13579135 with a vessel
-     * outside of Sydney Harbour because it shouldnt' be anywhere else).
+     * outside of Sydney Harbour because it shouldn't be anywhere else).
      * 
      * @param a first entity state
      * @param b second entity state
@@ -80,14 +80,14 @@ public interface System<K, V, M> {
 
     M merge(M a, M b);
 
-    System<K, V, M> update(List<EntityState<K, V, M>> matches,
+    ViemSystem<K, V, M> update(List<EntityState<K, V, M>> matches,
             Set<EntityState<K, V, M>> newEntityStates);
 
     default EntityState<K, V, M> createEntityState(Map<K, V> identifiers, M metadata) {
         return EntityState.create(identifiers, metadata);
     }
 
-    default System<K, V, M> merge(EntityState<K, V, M> entity) {
+    default ViemSystem<K, V, M> merge(EntityState<K, V, M> entity) {
         MergeResult<K, V, M> r = Algorithm.merge(this, entity);
         return update(r.matches, r.newEntityStates);
     }
