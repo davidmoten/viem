@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ class ViemSystem1 implements ViemSystem<String, String, Long> {
     EntityState<String, String, Long> es2;
 
     @Override
-    public void comparing(EntityState<String, String, Long> a,
+    public void checkingMetadataMergeability(EntityState<String, String, Long> a,
             EntityState<String, String, Long> b) {
         es1 = a;
         es2 = b;

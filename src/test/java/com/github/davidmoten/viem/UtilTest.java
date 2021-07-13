@@ -25,8 +25,8 @@ public class UtilTest {
     @Test
     public void testGreaterThan() {
         ViemSystem1 system = ViemSystem1.create();
-        assertEquals(1, Algorithm.compare(system, "A", "B"));
-        assertEquals(-1, Algorithm.compare(system, "B", "A"));
+        assertEquals(-1, Algorithm.compare(system, "A", "B"));
+        assertEquals(1, Algorithm.compare(system, "B", "A"));
     }
 
 }
