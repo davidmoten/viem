@@ -8,6 +8,7 @@
         <groupId>com.github.davidmoten</groupId>
         <artifactId>sonatype-parent</artifactId>
         <version>0.1</version>
+        <relativePath></relativePath>
     </parent>
     <artifactId>viem</artifactId>
     <version>0.1-SNAPSHOT</version>
