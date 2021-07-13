@@ -13,16 +13,6 @@ import java.util.stream.Collectors;
  */
 class ViemSystem2 implements ViemSystem<String, String, TimedPoint> {
 
-	EntityState<String, String, TimedPoint> es1;
-	EntityState<String, String, TimedPoint> es2;
-
-	@Override
-	public void checkingMetadataMergeability(EntityState<String, String, TimedPoint> a,
-			EntityState<String, String, TimedPoint> b) {
-		es1 = a;
-		es2 = b;
-	}
-
 	private final Set<EntityState<String, String, TimedPoint>> set;
 
 	public ViemSystem2(Set<EntityState<String, String, TimedPoint>> set) {
