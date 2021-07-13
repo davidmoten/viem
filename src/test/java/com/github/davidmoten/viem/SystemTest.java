@@ -93,8 +93,6 @@ public class SystemTest {
 		ViemSystem2 sys = system2(es1, es2, es3);
 		EntityState<String, String, TimedPoint> esNew = es2(1, 1, "A1", "D1", "F1");
 		Set<EntityState<String, String, TimedPoint>> actual = sys.merge(esNew).toSet();
-		System.out.println("Resultant system:");
-		actual.forEach(System.out::println);
 		assertEquals(set( //
 				es2(2, 2, "A1", "B1", "C1", "D1"), es2(3, 6, "E1", "F1")), actual);
 	}

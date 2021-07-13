@@ -110,10 +110,7 @@ final class Algorithm {
 					return compare(system, x, y);
 				});
 		EntityState<K, V, M> p = e;
-		System.out.println("matches:");
-		matches.forEach(x -> System.out.println("  " + x));
 		for (EntityState<K, V, M> f : matches) {
-			System.out.println("comparing " + p + "\n with match " + f);
 			Map<K, V> i1 = common(p, f);
 			Map<K, Pair<V>> i2 = conflicting(p, f);
 			Map<K, V> i3 = exclusive(p, f);
