@@ -67,7 +67,8 @@ find M which is the set of all entity-states in S that have one or more common i
 
 let I = the set of all identifiers in entity-states in M
 
-sort the members of M into a list L of descending order of identifier confidence based on the highest confidence identifier in the common identifiers with e.
+sort the members of M into a list L of descending order of identifier confidence based on the 
+  highest confidence identifier in the common identifiers with e.
 
 Set the provisional entity-state p = e
 let M2 = empty set of entity-states
