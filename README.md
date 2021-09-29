@@ -5,9 +5,20 @@
 
 An algorithm and a java library for handling entity matching when entities can have multiple identifiers each of which is potentially volatile (having a non-permanent lifecycle).
 
-Status: *beta*
+Status: *in production use, deployed to Maven Central"
 
 See [entity-tracking-in-memory](https://github.com/davidmoten/entity-tracking-in-memory) for an implementation of *viem*.
+
+## Getting started
+Add this dependency to your pom.xml:
+
+```java
+<dependency>
+  <groupId>com.github.davidmoten</groupId>
+  <artifactId>viem</artifactId>
+  <version>VERSION_HERE</version>
+</dependency>
+```
 
 ## Problem statement
 My workplace has multiple sources of craft (vessel, aircraft, vehicle, tracking device, beacons) information coming in as timestamped geographic positions with metadata.
