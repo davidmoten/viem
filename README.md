@@ -12,7 +12,7 @@ See [entity-tracking-in-memory](https://github.com/davidmoten/entity-tracking-in
 ## Getting started
 Add this dependency to your pom.xml:
 
-```java
+```xml
 <dependency>
   <groupId>com.github.davidmoten</groupId>
   <artifactId>viem</artifactId>
